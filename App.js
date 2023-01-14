@@ -29,45 +29,36 @@ import SingleTenant from './src/SingleTenant';
 import PaymentsHistory from './src/PaymentsHistory';
 import SingleTenantBalances from './src/SingleTenantBalances';
 import Home from './src/Home';
-
+import BottomNavigationScreen from './src/BottomNavigation';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import thunk from 'redux-thunk';
+
+
+// import {createDrawerNavigator} from '@react-navigation/drawer';
+import {applyMiddleware} from 'redux';
+import {Provider} from 'react-redux';
+import {persistStore} from 'redux-persist';
+import {PersistGate} from 'redux-persist/integration/react';
+import { createStore } from 'redux';
+import AllReducers from './src/redux/AllReducers';
 const Stack = createNativeStackNavigator();
 
 const App= () => {
-  const file = require('./src/file.pdf');
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-  let message ="am going to be grateful for the gift of life"
-  const options1 = Platform.select({
-    android: {
-      activityItemSources: [
-        {
-          // For sharing text.
-          placeholderItem: { type: 'text', content: message },
-          item: {
-            default: { type: 'text', content: message },
-            message: null, // Specify no text to share via Messages app.
-          },
-          linkMetadata: {
-            // For showing app icon on share preview.
-            title: message,
-          },
-        },
-      ]
-    }
-  })
+  let store = createStore(AllReducers, applyMiddleware(thunk))
+  
+  let persistor = persistStore(store)
 
 
   return (  
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor} >
     <PaperProvider>
       <ToastProvider>
       <NavigationContainer>
-     <Stack.Navigator initialRouteName='Home'>
+     <Stack.Navigator initialRouteName='BottomNavigationScreen'>
             <Stack.Screen name="addrent" component={AddRent} options={{ header: () => null }} />
         <Stack.Screen name="AddRooms" component={AddRooms} options={{header: () => null}} />
         <Stack.Screen name="AddTenant" component={AddTenant} options={{header: () => null}} />
@@ -75,18 +66,18 @@ const App= () => {
             <Stack.Screen name="SingleTenant" component={SingleTenant} options={{ header: () => null }} />
             <Stack.Screen name="SingleTenantBalances" component={SingleTenantBalances} options={{ header: () => null }} />
             <Stack.Screen name="PaymentsHistory" component={PaymentsHistory} options={{ header: () => null }} />
-        <Stack.Screen name="Home" component={Home} options={{header: () => null}} />
-            
-            
-        
-            
-        
+            <Stack.Screen name="Home" component={Home} options={{ header: () => null }} />
+            <Stack.Screen name="BottomNavigationScreen" component={BottomNavigationScreen} options={{ header: () => null }} />
+ 
       </Stack.Navigator>
     </NavigationContainer>
        
       </ToastProvider>  
     
     </PaperProvider>
+      </PersistGate>
+
+    </Provider>
   );
 };
 

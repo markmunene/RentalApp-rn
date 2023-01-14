@@ -45,7 +45,7 @@ const AddProperty = ({navigation}) => {
               mode="outlined"
       />
     
-      <Button icon="add" mode='contained' style={{
+      <Button icon="plus" mode='contained' style={{
         width: '50%',
         marginTop: 20, 
         backgroundColor:'grey'

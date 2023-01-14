@@ -1,17 +1,140 @@
 import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, {useState} from 'react'
 import Header from './Header'
-import { MD2Colors, ProgressBar } from 'react-native-paper';
+import { MD2Colors, ProgressBar, Searchbar } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import DropDown from "react-native-paper-dropdown";
+import DropDown1 from './Dropdown';
+
 
 const Home = ({ navigation }) => {
     const { width, height } = Dimensions.get('window');
+    const [searchQuery, setSearchQuery] = React.useState('');
+    const [apartment, setapartment] = React.useState('');
 
-    
+    const onChangeSearch = query => setSearchQuery(query);
+
+    const [showDropDown, setShowDropDown] = useState(false);
+    const [showDropDown1, setShowDropDown1] = useState(false);
+    const [showFilters, setshowFilters] = useState(false);
+    const [selected, setSelected] = useState(undefined);
+    const data = [
+        { label: 'One', value: '1' },
+        { label: 'Two', value: '2' },
+        { label: 'Three', value: '3' },
+        { label: 'Four', value: '4' },
+        { label: 'Five', value: '5' },
+    ];
+    let Data2 = [
+        { label: 'Paid', value: 'Paid' },
+        { label: 'UnPaid', value: 'UnPaid' },
+    ]
+    const colorList = [
+        {
+          label: "rungai",
+          value: "rungai",
+        },
+        {
+          label: "utawala",
+          value: "utawala",
+        },
+        {
+          label: "umoja",
+          value: "umoja",
+        },
+        {
+          label: "pipeline",
+          value: "pipeline",
+        },
+        {
+          label: "dandora",
+          value: "dandora",
+        }
+      ];
   return (
     <View style ={styles.container}>
           <View style={{width:'100%', height:60}} >
               <Header Title="Dashboard" navigation={navigation} iconName="arrow-left-bold" />
           </View>
+
+          <View style={{
+              flexDirection: 'row',
+              width: '100%',
+              height: 40,
+              paddingHorizontal:20,
+              marginTop:30,
+
+              
+          }}>
+                 <Searchbar
+                     placeholder="Tenant Name"
+                     onChangeText={onChangeSearch}
+                  value={searchQuery}
+                  style={{
+                width:'70%'
+            }}
+              />
+              <TouchableOpacity style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  width: '30%',
+                  height:40
+              }}
+                  onPress={()=>setshowFilters(!showFilters)}
+              >
+                  <Icon name="filter-variant" size={25} color="black" />
+                  <Text style={{
+                      fontSize: 16,
+                      fontWeight:'700'
+                  }}>
+                      Filters
+                  </Text> 
+                  
+              </TouchableOpacity>
+          </View>
+          {
+              showFilters ? 
+              <View style={{
+                flexDirection: 'row',
+                width: '100%',
+                alignSelf: "center"
+                ,height:100
+                
+            }}>
+                <TouchableOpacity style={{
+                    width: '20%',
+                    height: 100,
+                    justifyContent: 'center',
+                    alignItems:'center'
+                }}>
+                    <Text style={{fontWeight:'900', fontSize:18, marginLeft:5}}>All</Text>
+                </TouchableOpacity>
+                <View style={{
+                    flexDirection: 'row',
+                    width: '40%'
+                    ,
+                    justifyContent: 'center',
+                    alignItems:'center'
+                }}>
+             
+                    <DropDown1 label='Apartment' data={data} onSelect={setSelected} />
+                    <Text style={{fontWeight:'900', fontSize:18, marginLeft:5}}>8</Text>
+                </View>
+                <View style={{
+                    flexDirection: 'row',
+                    width: '40%',
+                
+                    alignItems:'center'
+                }}>
+                <DropDown1 label='Payment Status' data={Data2} onSelect={setSelected} />
+                    <Text style={{fontWeight:'900', fontSize:18, marginLeft:5}}>9</Text>
+                </View>
+                
+                
+            </View>
+               : <View></View>
+          }
+      
           {/* Rent Totals */}
           <View style={{
               width: '100%',
@@ -98,7 +221,10 @@ const Home = ({ navigation }) => {
               backgroundColor: 'white', 
               paddingTop: 15, 
               alignSelf: "center", 
-              borderRadius:10
+              borderRadius: 10,
+              marginTop: 20, 
+              
+              
           }}
               onPress={()=>navigation.navigate("SingleTenant")}
           >

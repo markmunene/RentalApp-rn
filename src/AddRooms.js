@@ -1,13 +1,23 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
 import { Button, TextInput } from 'react-native-paper';
-import DropDown from "react-native-paper-dropdown";
+// import DropDown from "react-native-paper-dropdown";
 import Header from './Header';
+import Dropdown from './Dropdown';
 
 const AddRooms = ({navigation}) => {
     const [RentAmount, setRentAmount] = useState();
     const [showDropDown, setShowDropDown] = useState(false);
-    const [RoomNumber, setRoomNumber] = useState("");
+  const [RoomNumber, setRoomNumber] = useState("");
+  const [Tenant, setTenant] = useState("");
+  const [selected, setSelected] = useState(undefined);
+  const data = [
+      { label: 'One', value: '1' },
+      { label: 'Two', value: '2' },
+      { label: 'Three', value: '3' },
+      { label: 'Four', value: '4' },
+      { label: 'Five', value: '5' },
+  ];
 
     const colorList = [
         {
@@ -41,16 +51,14 @@ const AddRooms = ({navigation}) => {
         <Header Title="Add Rooms" iconName="arrow-left-bold" navigation={navigation}  />
 
       </View>
-           <DropDown
-              label={"Property"}
-              mode={"outlined"}
-              visible={showDropDown}
-              showDropDown={() => setShowDropDown(true)}
-              onDismiss={() => setShowDropDown(false)}
-              value={Tenant}
-              setValue={setTenant}
-              list={colorList}
-            />
+      <View style={{
+        marginTop: 30, 
+        width: '112%',
+        justifyContent: 'center',
+        alignItems:'center'
+      }}>
+        <Dropdown  label="Select Property" data={data} onSelect={setSelected} />
+           </View>
     
        <TextInput
         style={{
@@ -64,7 +72,7 @@ const AddRooms = ({navigation}) => {
               mode="outlined"
       />
      
-          <Button icon="music" mode='contained'
+          <Button icon="plus" mode='contained'
         style={{
         width: '50%',
         marginTop: 20, 
