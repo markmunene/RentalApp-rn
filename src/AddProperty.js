@@ -3,12 +3,18 @@ import React, { useState } from 'react'
 import { Button, TextInput } from 'react-native-paper';
 import DropDown from "react-native-paper-dropdown";
 import Header from './Header';
+import firestore from '@react-native-firebase/firestore'
 
 const AddProperty = ({navigation}) => {
     const [RentAmount, setRentAmount] = useState();
     const [showDropDown, setShowDropDown] = useState(false);
     const [PropertyName, setPropertyName] = useState("");
-    const [Location, setLocation] = useState("");
+  const [Location, setLocation] = useState("");
+  
+  const HandleAddingProperty = () => {
+    
+    
+  }
 
 
     

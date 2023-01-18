@@ -5,8 +5,24 @@ const AddTenant = React.lazy(() => import('./AddTenant'));
 const AddRooms = React.lazy(() => import('./AddRooms'));
 const AddProperty = React.lazy(() => import('./AddProperty'));
 const Home = React.lazy(() => import('./Home'));
+import { StackActions } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 
-const BottomNavigationScreen = ({navigation}) => {
+const BottomNavigationScreen = ({ navigation }) => {
+  let Landlord = useSelector(state => state.Landlord.Authenticated_landlord);
+  
+//   React.useEffect(() => {
+//     if (Landlord.length > 0) {
+// console.log("am a genuis in miraa");
+//        navigation.dispatch(StackActions.replace("Home"))
+//     } else {
+//       console.log("sasa izi ni gani");
+//       navigation.dispatch(StackActions.replace("Login"));
+
+//     }
+
+
+//   },[])
   
     const AddTenantRoute = () => (
         <React.Suspense
