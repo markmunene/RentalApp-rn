@@ -1,12 +1,24 @@
 import { StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native'
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Button, TextInput } from 'react-native-paper';
-import DropDown from "react-native-paper-dropdown";
+import Dropdown from './Dropdown';
 import DatePicker from 'react-native-modern-datepicker';
+import SpinnerModal from './SpinnerModal'
+import firestore from '@react-native-firebase/firestore'
+import { useToast } from 'react-native-toast-notifications';
+import { useSelector, useDispatch } from 'react-redux';
+import { Add_New_Tenant_Action } from './redux/TenanantsReducer';
+import { Filter_SingleProperty_By_Id_Action } from './redux/PropertyReducer';
 
 import Header from './Header';
 
-const AddTenant = ({navigation}) => {
+const AddTenant = ({ navigation }) => {
+  const toast = useToast();
+  const dispatch = useDispatch();
+  let Landlord = useSelector(state => state.Landlord.Authenticated_landlord);
+  let DropdownProperties = useSelector(state => state.Propertys.DropdownProperties);
+  let SingleProperty = useSelector(state => state.Propertys.SingleProperty);
+
     const [RentAmount, setRentAmount] = useState();
     const [showDropDown, setShowDropDown] = useState(false);
   const [Tenant, setTenant] = useState("");
@@ -18,13 +30,13 @@ const AddTenant = ({navigation}) => {
   const [occupants, setoccupants] = useState("");
   const [RentalFees, setRentalFees] = useState("");
   const [RoomNumber, setRoomNumber] = useState("");
-  const [PropertyName, setPropertyName] = useState("");
-    const [Email, setEmail] = useState("");
-    
-    
-    
+  const [PropertyName, setPropertyName] = useState(undefined);
+  const [Email, setEmail] = useState("");
+  const [RoomsArray, setRoomsArray] = useState("");
   
+  const [showModal, setShowModal] = useState(false);
 
+    
     const [date, setDate] = useState(new Date());
     const [show, setShow] = useState(false);
   
@@ -37,7 +49,97 @@ const AddTenant = ({navigation}) => {
         setDate(selectedDate);
         setleaseStarts(selectedDate)
      
+  }
+  const Test = () => {
+    console.log("am testing something good");
+  }
+
+  useEffect(
+    () => {
+     
+      if (PropertyName !== undefined) {
+       
+        let Rooms1 = SingleProperty[0]?.Rooms;
+        let tempRooms = Rooms1.map(item => {
+          return {
+            label: item.RoomNumber,
+            value:item.RoomNumber,
+          }
+        })
+        setRoomsArray(tempRooms)
+        
       }
+      
+    },[PropertyName, SingleProperty]
+  );
+  const HandleSaveTenant = async () => {
+    
+    if (Tenant !== "" && PhoneNumber !== "" && paymentDue !== "" && deposit !== "" && leaseStarts !== "" && occupants !== "" && RentalFees !== "" && RoomNumber
+      !== "" && PropertyName !== "" && Email !== "") {
+      let data ={
+        PropertyName:PropertyName.label,
+        Tenant,
+        PhoneNumber,
+        paymentDue,
+        deposit,
+        leaseStarts,
+        occupants,
+        RentalFees,
+        Email,
+        Balance: Number(RentalFees) + Number(deposit),
+        ActualBalance: Number(RentalFees) + Number(deposit),
+        OverDraft:0,
+        RoomNumber: RoomNumber.value,
+        createdAt: Date.now(),
+       
+      }
+      setShowModal(true)
+      await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("tenants").add({
+        ...data,
+        
+      }).then(res => {
+        dispatch(Add_New_Tenant_Action({
+          ...data,
+          id: res.id
+        }));
+        setShowModal(false);
+        setEmail("");
+        setTenant("");
+        setPhoneNumber("");
+        setpaymentDue("");
+        setdeposit("");
+        setleaseStarts("");
+        setoccupants("");
+        setRentalFees("");
+        setRoomNumber("");
+        setPropertyName("");
+        toast.show("Tenant Created Successfully", {
+          type: "success",
+          placement: "bottom",
+          duration: 2400,
+          offset: 30,
+          animationType: "zoom-in",
+        });
+        navigation.navigate("BottomNavigationScreen")
+
+       }).catch(err => {
+        console.log("error", err);
+      });
+  
+} else {
+  toast.show("All fields must be Filled", {
+    
+      type: "danger",
+      placement: "bottom",
+      duration: 2900,
+      offset: 30,
+      animationType: "zoom-in",
+  
+  })
+  
+}
+    
+  }
   return (
     <View style={styles.container} >
       <View style={{
@@ -45,9 +147,10 @@ const AddTenant = ({navigation}) => {
         height: 60
         
       }}>
-        <Header Title="Add Tenant" iconName="arrow-left-bold" navigation={navigation}  />
+        <Header Title="Add Tenant" toHome="home" iconName="arrow-left-bold" showIcons="No" navigation={navigation}  />
 
       </View>
+      <SpinnerModal showModal={showModal} title="please wait ..." />
            {/* <DropDown
               label={"Gender"}
               mode={"outlined"}
@@ -138,8 +241,24 @@ const AddTenant = ({navigation}) => {
           marginTop:20
           
         }}
-              onChangeText={text => setPhoneNumber(text)}
-              label="PhoneNumber"
+           
+            onChangeText={text => {
+              if (text.toString().substr(0, 4) === '+254') {
+                setPhoneNumber(text.toString().substr(4));
+              }
+              else if (text.toString().substr(0, 3) === '254') {
+                setPhoneNumber(text.toString().substr(3));
+              }
+              else if (text.toString().substr(0, 1) === '0') {
+                setPhoneNumber(text.toString().substr(1));
+              }
+          
+              else {
+                setPhoneNumber(text); 
+              }
+            }}
+            label="PhoneNumber"
+            keyboardType='numeric'
               value={PhoneNumber}
               mode="outlined"
           />
@@ -192,7 +311,8 @@ const AddTenant = ({navigation}) => {
           
         }}
               onChangeText={text => setoccupants(text)}
-              label="occupants"
+            label="occupants"
+            keyboardType='numeric'
               value={occupants}
               mode="outlined"
         />
@@ -218,7 +338,8 @@ const AddTenant = ({navigation}) => {
           
         }}
               onChangeText={text => setRentalFees(text)}
-              label="RentalFees"
+            label="RentalFees"
+            keyboardType='numeric'
               value={RentalFees}
               mode="outlined"
         />
@@ -231,7 +352,8 @@ const AddTenant = ({navigation}) => {
         }}
               onChangeText={text => setpaymentDue(text)}
               label="paymentDue"
-              value={paymentDue}
+            value={paymentDue}
+            keyboardType='numeric'
               mode="outlined"
           />
             <TextInput
@@ -242,11 +364,45 @@ const AddTenant = ({navigation}) => {
           
         }}
               onChangeText={text => setdeposit(text)}
-              label="deposit"
+            label="deposit"
+            keyboardType='numeric'
               value={deposit}
               mode="outlined"
-        />
-            <TextInput
+          />
+          {/* property name */}
+          <View style={{
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: "center",
+            marginVertical:10
+          }}>
+            <Dropdown label="Select property" FilterProperty="Filter" data={DropdownProperties} onPress={Test} onSelect={setPropertyName} />
+            </View>
+                {/* <TextInput
+        style={{
+          width: '90%',
+          alignSelf: 'center',
+          marginTop:20
+          
+        }}
+              onChangeText={text => setPropertyName(text)}
+              label="PropertyName"
+              value={PropertyName}
+              mode="outlined"
+          /> */}
+
+          {/* room number dropdown */}
+
+          <View style={{
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: "center",
+            marginVertical:10
+          }}>
+          <Dropdown data={RoomsArray}   label="select Room" onSelect={setRoomNumber} />
+         </View>
+
+            {/* <TextInput
         style={{
           width: '90%',
           alignSelf: 'center',
@@ -257,7 +413,7 @@ const AddTenant = ({navigation}) => {
               label="RoomNumber"
               value={RoomNumber}
               mode="outlined"
-          />
+          /> */}
         
        
       <Button icon="plus" mode='contained' style={{
@@ -266,7 +422,9 @@ const AddTenant = ({navigation}) => {
             backgroundColor: 'grey',
            alignSelf:'center'
         
-      }}>
+          }}
+            onPress={()=>HandleSaveTenant()}
+          >
         Save
       </Button>
         </ScrollView>

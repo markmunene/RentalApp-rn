@@ -1,8 +1,12 @@
 import React, { FC, useState, useRef } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View , FlatList, Modal} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View , FlatList, Modal, ScrollView} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'
-const Dropdown = ({ label, data, onSelect }) => {
+import { useSelector, useDispatch } from 'react-redux';
+import { Filter_SingleProperty_By_Id_Action } from './redux/PropertyReducer';
 
+const Dropdown = ({ label, data, onSelect, FilterProperty }) => {
+  const dispatch = useDispatch();
+      // console.log(label,"label meeeeeeeeeeeeeeeeen", data, "dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     const [visible, setVisible] = useState(false);
     const [selected, setSelected] = useState(undefined);
 
@@ -18,7 +22,11 @@ const Dropdown = ({ label, data, onSelect }) => {
           </TouchableOpacity>
         )
     }
-    const onItemPress = (item)=> {
+  const onItemPress = (item) => {
+    if (FilterProperty == "Filter") {
+        
+        dispatch(Filter_SingleProperty_By_Id_Action(item.value))
+      }
         setSelected(item);
         onSelect(item);
         setVisible(false);
@@ -34,32 +42,32 @@ const [dropdownWidth, setDropdownWidth] = useState(0);
   
     DropdownButton.current.measure((_fx, _fy, _w, h, _px, py) => {
         setDropdownTop(py + h);
-        setDropdownXposition(_px)
-        setDropdownWidth(_w *1.35)
+      // setDropdownXposition(_px);
+        setDropdownWidth(_w)
         
 
     });
     setVisible(true);
     };
-    React.useEffect(() => {
-        DropdownButton.current.measure((_fx, _fy, _w, h, _px, py) => {
-            setDropdownTop(py + h);
-            setDropdownXposition(_px)
+    // React.useEffect(() => {
+    //     DropdownButton.current.measure((_fx, _fy, _w, h, _px, py) => {
+    //         setDropdownTop(py + h);
+    //         setDropdownXposition(_px)
            
-        });
+    //     });
        
         
-    },[])
+    // },[])
     const renderDropdown = () => {
      
           return (
-            <Modal visible={visible} transparent animationType="none">
+            <Modal visible={visible} transparent  animationType="none" >
             <TouchableOpacity
-              style={{...styles.overlay, marginLeft:dropdownXposition, width:dropdownWidth}}
+              style={{...styles.overlay, width:dropdownWidth, alignSelf:'center'}}
                       onPress={() => setVisible(false)}
                      
             >
-              <View style={[styles.dropdown, { top: dropdownTop }]}>
+              <View style={[styles.dropdown]}>
                 <FlatList
                   data={data}
                   renderItem={renderItem}
@@ -95,7 +103,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#fff',
         height: 40,
-        width: '80%',
+        width: '90%',
         paddingHorizontal: 10,
         zIndex: 1,
     borderRadius: 5,
@@ -107,10 +115,15 @@ const styles = StyleSheet.create({
     },
     overlay: {
         elevation: 10,
-        width: '70%',
+        width: '90%',
         padding: 20,
         margin: 20,
-        borderRadius: 20,
+      borderRadius: 20,
+      height: 200,
+      top: 100,
+        
+    
+      marginBottom:20
        
     
     }, 
@@ -129,18 +142,22 @@ const styles = StyleSheet.create({
     //     borderBottomColor:'black'
     //   },
     dropdown: {
-        position: 'absolute',
+       
         backgroundColor: '#fff',
         width: '100%',
         shadowColor: '#000000',
         shadowRadius: 4,
         shadowOffset: { height: 4, width: 0 },
-        shadowOpacity: 0.5,
+      shadowOpacity: 0.5,
+      height: 200,
+      
+       
     },
     item: {
         paddingHorizontal: 10,
         paddingVertical: 10,
-        borderBottomWidth: 1,
+      borderBottomWidth: 1,
+        // height:40
         
       },
 })

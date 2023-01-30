@@ -1,60 +1,204 @@
-import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native'
-import React, {useState} from 'react'
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity, FlatList } from 'react-native'
+import React, {useState, useEffect, useCallback, useRef} from 'react'
 import Header from './Header'
-import { MD2Colors, ProgressBar, Searchbar } from 'react-native-paper';
+import { MD2Colors, ProgressBar, Searchbar, TextInput } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import DropDown from "react-native-paper-dropdown";
+import { useDispatch, useSelector } from 'react-redux';
+import firestore from '@react-native-firebase/firestore'
+
+import { Add_Auth_Landord_action } from './redux/OwnersReducer';
+import { Get_All_Properties_Action } from './redux/PropertyReducer';
+import {
+    Get_All_tenants_Action, Filter_Tenant_By_Name_Action,
+    Filter_SingleTenant_By_Id_Action,
+    Filter_Tenant_By_Property_Action,
+    Filter_Tenant_By_BalanceAmount_Action,
+    Update_Tenant_By_Name_Action
+} from './redux/TenanantsReducer';
 import DropDown1 from './Dropdown';
+import moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Home = ({ navigation }) => {
-    const { width, height } = Dimensions.get('window');
+    let Landlord = useSelector(state => state.Landlord.Authenticated_landlord);
+    let DropdownProperties = useSelector(state => state.Propertys.DropdownProperties);
+    let AllTenants = useSelector(state => state.Tenants.Tenants);
+    const dispatch = useDispatch();
     const [searchQuery, setSearchQuery] = React.useState('');
-    const [apartment, setapartment] = React.useState('');
-
-    const onChangeSearch = query => setSearchQuery(query);
-
-    const [showDropDown, setShowDropDown] = useState(false);
-    const [showDropDown1, setShowDropDown1] = useState(false);
+    
+    const onChangeSearch = query => {
+        setSearchQuery(query);
+        dispatch(Filter_Tenant_By_Name_Action(query));
+    };
     const [showFilters, setshowFilters] = useState(false);
+    const [SearchBalance, setSearchBalance] = useState("");
+    const [ActulaBalanceState, setActulaBalanceState] = useState(0);
+    const [PaidBalanceState, setPaidBalanceState] = useState(0);
+    const [ProgressState, setProgressState] = useState(0);
     const [selected, setSelected] = useState(undefined);
-    const data = [
-        { label: 'One', value: '1' },
-        { label: 'Two', value: '2' },
-        { label: 'Three', value: '3' },
-        { label: 'Four', value: '4' },
-        { label: 'Five', value: '5' },
-    ];
-    let Data2 = [
-        { label: 'Paid', value: 'Paid' },
-        { label: 'UnPaid', value: 'UnPaid' },
-    ]
-    const colorList = [
-        {
-          label: "rungai",
-          value: "rungai",
-        },
-        {
-          label: "utawala",
-          value: "utawala",
-        },
-        {
-          label: "umoja",
-          value: "umoja",
-        },
-        {
-          label: "pipeline",
-          value: "pipeline",
-        },
-        {
-          label: "dandora",
-          value: "dandora",
+  
+    useEffect(() => {
+        
+        dispatch(Get_All_Properties_Action({ OwnerId: Landlord[0].OwnerId }))
+        dispatch(Get_All_tenants_Action({ OwnerId: Landlord[0].OwnerId }));
+
+      
+        
+    }, []);
+    useEffect(() => {
+        // console.log(AllTenants);
+        let tempPaidBalance = AllTenants.reduce((a, b) => {
+            return Number(b.Balance) + Number(a)
+        }, 0);
+       
+        let tempActualBalance = AllTenants.reduce((a, b) => {
+            return Number(b.RentalFees) + a;  
+        }, 0)
+        setActulaBalanceState(tempActualBalance);
+        setPaidBalanceState(tempPaidBalance);
+        setProgressState((tempActualBalance - tempPaidBalance)/tempActualBalance)
+      
+    
+      return () => {
+        
+      }
+    }, [AllTenants])
+    
+
+    const RenderItem = ({item}) => {
+        return (
+            <TouchableOpacity style={{
+                width: '92%', height: 80,
+                borderRadius: 10, padding: 10,
+                elevation: 5, flexDirection: 'row',
+                justifyContent: 'space-between',
+                backgroundColor: 'white', 
+                paddingTop: 15, 
+                alignSelf: "center", 
+                borderRadius: 10,
+                marginTop: 10, 
+                
+                
+            }}
+                onPress={() => {
+                    dispatch(Filter_SingleTenant_By_Id_Action(item.id));
+                    navigation.navigate("SingleTenant")
+                }}
+            >
+                <View>
+                    <Text style={styles.textStyle}>{item.Tenant }</Text>
+                    <Text style={{ ...styles.textStyle, fontSize: 14 }}>{item.RoomNumber} { item.PropertyName }</Text>
+                </View>
+                <View>
+                    <Text style={styles.textStyle}>Bal:{ item.Balance }</Text>
+                    <Text style={{ ...styles.textStyle, fontSize: 14, alignSelf:'flex-end' }}>{moment().format('MMMyy') }</Text>
+                    
+                    
+                </View>
+            </TouchableOpacity>
+        )
+    }
+    const HandleFilterByApartMent = (item) => {
+        setSelected(item)
+        
+        dispatch(Filter_Tenant_By_Property_Action(item.label))
+    }
+    const onBalanceSearch = (item) => {
+        setSearchBalance(item)
+        dispatch(Filter_Tenant_By_BalanceAmount_Action(item))
+    }
+
+    // function to add rent to tents immedietely after one month
+    const AddRentToAllTenantMonthly = async () => {
+        // check if its new month using moment and async
+        // if true check each tenant collecion
+            // 1. check overdraft
+            // 2. update balance
+            // 3. update async storage
+        // else ignore
+        let month = new Date().getMonth() +1;
+        // console.log(month, "month men");
+
+        let storedMonth = await AsyncStorage.getItem("storedMonth");
+        // console.log(storedMonth, "our pride as a nation");
+        if (storedMonth !== null ) {
+           await AsyncStorage.setItem("storedMonth", JSON.stringify(month))
+            
+           
+            if (JSON.parse(storedMonth) !== month) {
+              
+                await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("tenants").get().then(res => {
+                
+                    res.docs.map( async docs => {
+                     
+                        try {
+                            if (docs.data().OverDraft > 0) {
+                                let Bal = docs.data().OverDraft - docs.data().RentalFees;
+                                await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("tenants").doc(docs.id).update({
+                                    Balance: Bal <= 0 ? Math.abs(Bal) : 0,
+                                    OverDraft: Bal <= 0 ? 0: Math.abs(Bal)
+                                }).then(res => { }).catch(err => {
+                                    console.log(err, "kwanza");
+                                })
+
+                                dispatch(Update_Tenant_By_Name_Action({
+                                    ...docs.data(),
+                                    id: docs.id,
+                                    Balance: Bal <= 0 ? Math.abs(Bal) : 0,
+                                    OverDraft: Bal <= 0 ? 0: Math.abs(Bal)
+                                    }))
+                                    
+                            } else {
+                               console.log(Number(docs.data().Balance), docs.data().Tenant);
+                                    await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("tenants").doc(docs.id).update({
+                                        Balance: Number(docs.data().RentalFees) + Number(docs.data().Balance),
+                                        OverDraft:0
+                                    }).then(res => { }).catch(err => {
+                                        console.log(err, "azimio");
+                                    })
+                                dispatch(Update_Tenant_By_Name_Action({
+                                    ...docs.data(),
+                                    id: docs.id,
+                                    Balance: Number(docs.data().RentalFees) + Number(docs.data().Balance),
+                                    OverDraft:0
+                                    }))
+                                }
+                            
+                        } catch (error) {
+                            console.log(error);
+                        }
+                       
+                       
+                    })
+                }).catch(err=>{console.log(err);})
+            } 
+           
+
+        } else {
+            console.log("naskia");
+
+           await AsyncStorage.setItem("storedMonth", JSON.stringify(month))
+
         }
-      ];
+
+    }
+    useEffect(() => {
+      
+        AddRentToAllTenantMonthly()
+        // navigation.navigate("Hom")
+    
+        return () => {
+        
+        }
+    }, []);
+    console.log("amcalled, amback");
+
+    
   return (
     <View style ={styles.container}>
           <View style={{width:'100%', height:60}} >
-              <Header Title="Dashboard" navigation={navigation} iconName="arrow-left-bold" />
+              <Header Title="Dashboard" toHome="none" navigation={navigation} showIcons="Yes" iconName="arrow-left-bold" />
           </View>
 
           <View style={{
@@ -80,6 +224,9 @@ const Home = ({ navigation }) => {
                   width: '30%',
                   height:40
               }}
+                //   onPress={() => {
+                //       dispatch(Add_Auth_Landord_action([]))
+                //   }}
                   onPress={()=>setshowFilters(!showFilters)}
               >
                   <Icon name="filter-variant" size={25} color="black" />
@@ -101,7 +248,11 @@ const Home = ({ navigation }) => {
                 ,height:100
                 
             }}>
-                <TouchableOpacity style={{
+                      <TouchableOpacity
+                          onPress={() => {
+                            dispatch(Filter_Tenant_By_Name_Action(""));
+                          }}
+                          style={{
                     width: '20%',
                     height: 100,
                     justifyContent: 'center',
@@ -117,8 +268,8 @@ const Home = ({ navigation }) => {
                     alignItems:'center'
                 }}>
              
-                    <DropDown1 label='Apartment' data={data} onSelect={setSelected} />
-                    <Text style={{fontWeight:'900', fontSize:18, marginLeft:5}}>8</Text>
+                    <DropDown1 label='Apartment' data={DropdownProperties} onSelect={HandleFilterByApartMent} />
+                          <Text style={{ fontWeight: '900', fontSize: 18, marginHorizontal: 5,  }}>{DropdownProperties.length }</Text>
                 </View>
                 <View style={{
                     flexDirection: 'row',
@@ -126,8 +277,19 @@ const Home = ({ navigation }) => {
                 
                     alignItems:'center'
                 }}>
-                <DropDown1 label='Payment Status' data={Data2} onSelect={setSelected} />
-                    <Text style={{fontWeight:'900', fontSize:18, marginLeft:5}}>9</Text>
+                   <TextInput
+                              placeholder="Balance"
+                              mode='outlined'
+                     onChangeText={onBalanceSearch}
+                  value={SearchBalance}
+                  style={{
+                      width: '90%',
+                      padding: 0,
+                      fontSize: 14,
+                      alignSelf:'center'
+                      
+            }}
+              />
                 </View>
                 
                 
@@ -169,20 +331,20 @@ const Home = ({ navigation }) => {
                   }>
                       <Text style={{fontWeight: '900',
                       fontSize:12}}>
-                          jan 2023
+                          {moment().format("MMMYY")}
                       </Text>
                   </View>
 
               </View>
               <View style={{marginBottom:20}}>
-                  <Text style={{fontSize:18}}>Total rent for Jan</Text>
+                  <Text style={{ fontSize: 18 }}>Total rent for { moment(Date.now()).format("MMMYY") }</Text>
                   <Text style={{
                       fontWeight: '900',
                       fontSize:16
-                  }}>Ksh 40480</Text>
+                  }}>Ksh {ActulaBalanceState}</Text>
               </View>
               <View style={{width:'100%', padding:10}}>
-                  <ProgressBar progress={0.5} color="green" style={{
+                  <ProgressBar progress={ProgressState} color="green" style={{
                       height: 10, borderRadius: 10,
                       backgroundColor:"red"
                   }} />
@@ -199,7 +361,7 @@ const Home = ({ navigation }) => {
                       }}>Collected</Text>
                       <Text style={{fontWeight: '900',
                       fontSize:16}}>
-                          Ksh 125.00
+                          Ksh {ActulaBalanceState - PaidBalanceState}
                       </Text>
                   </View>
                   <View>
@@ -208,7 +370,7 @@ const Home = ({ navigation }) => {
                       }}>Pending</Text>
                       <Text style={{fontWeight: '900',
                       fontSize:16}}>
-                          Ksh 3675.00
+                          Ksh {ActulaBalanceState-(ActulaBalanceState - PaidBalanceState)}
                       </Text>
                   </View>
                   
@@ -216,29 +378,7 @@ const Home = ({ navigation }) => {
 
           </View>
           {/* TENANTS */}
-          <TouchableOpacity style={{
-              width: '92%', height: 80, borderRadius: 10, padding: 10, elevation: 5, flexDirection: 'row', justifyContent: 'space-between',
-              backgroundColor: 'white', 
-              paddingTop: 15, 
-              alignSelf: "center", 
-              borderRadius: 10,
-              marginTop: 20, 
-              
-              
-          }}
-              onPress={()=>navigation.navigate("SingleTenant")}
-          >
-              <View>
-                  <Text style={styles.textStyle}>Mark Munene</Text>
-                  <Text style={{...styles.textStyle, fontSize:14}}>Room: 123 malindi apartment</Text>
-              </View>
-              <View>
-                  <Text style={styles.textStyle}>Bal:6000</Text>
-              <Text style={{...styles.textStyle, fontSize:14}}>jan 2023</Text>
-                  
-                  
-              </View>
-          </TouchableOpacity>
+          <FlatList data={AllTenants} renderItem={({item})=> <RenderItem  item={item}/>} keyExtractor={(item)=> item?.id + item.Tenant} />
     </View>
   )
 }

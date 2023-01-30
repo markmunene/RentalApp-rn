@@ -1,11 +1,32 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, FlatList } from 'react-native'
+import React, {useState, useEffect, useCallback} from 'react'
 import { FAB } from 'react-native-paper'
 import Header from './Header'
 import TopBtns from './TopBtns'
 import Share from 'react-native-share';
-
+import firestore from '@react-native-firebase/firestore'
+import { useSelector, useDispatch } from 'react-redux';
+import SpinnerModal from './SpinnerModal';
+import { useToast } from 'react-native-toast-notifications';
+import { Get_All_Transactions_Action } from './redux/TenanantsReducer'
 const SingleTenantBalances = ({ navigation }) => {
+    const toast = useToast();
+    const dispatch = useDispatch();
+    const SingleTenant = useSelector(state => state.Tenants.SingleTeanants);
+    const Transactions = useSelector(state => state.Tenants.Transactions);
+   
+    let Landlord = useSelector(state => state.Landlord.Authenticated_landlord);
+
+    useEffect(() => {
+        dispatch(Get_All_Transactions_Action({
+            OwnerId: Landlord[0].OwnerId,
+            id: SingleTenant[0].id
+      }))
+    
+      return () => {   
+      }
+    }, [])
+    
     let options = {
         title: "Share via whatsapp",
         message: "some awesome dangerous message",

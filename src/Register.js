@@ -2,7 +2,7 @@
 // SHA1: 57:09:A4:68:76:F9:CB:FD:07:9D:7C:87:18:20:E0:50:7C:3D:BA:88
 // SHA-256: 85:8C:06:F4:8A:82:02:09:17:99:CE:29:92:65:92:F0:D3:60:12:40:7F:25:3D:E2:0B:8F:09:AB:77:EF:AC:CA
 import { StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, TextInput } from 'react-native-paper';
 // import DropDown from "react-native-paper-dropdown";
 import Header from './Header';
@@ -13,7 +13,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useToast } from 'react-native-toast-notifications';
 import SpinnerModal from './SpinnerModal';
 import { useDispatch } from 'react-redux';
-import { Add_Auth_Landord_action } from './redux/OwnersReducer';
+import { Add_Auth_Landord_action,Add_Auth_Screen_Action  } from './redux/OwnersReducer';
 
 const Register = ({ navigation }) => {
     
@@ -28,6 +28,11 @@ const Register = ({ navigation }) => {
     const [showModal, setshowModal] = useState(false);
 
     const toast = useToast();
+
+    useEffect(() => {
+        dispatch(Add_Auth_Screen_Action("Register"))
+    }, []);
+    
     
     const HandleSignUpWithEmail = async() => {
         if (Email != '' && Password !=="" && LandlordPhoneNumber !=="" && OwnerName !=="") {
@@ -48,7 +53,7 @@ const Register = ({ navigation }) => {
                 }
                 let ownerArray = [];
                 ownerArray.push(ownerInfo)
-                await firestore().collection(`${OwnerName}${res.user.uid}`).add({...ownerInfo}).then(res => {
+                await firestore().collection("Owners").doc(res.user.uid).set({...ownerInfo}).then(res => {
                     // add user to redux and change authenticated state to true
                     dispatch(Add_Auth_Landord_action(ownerArray))
                 }).catch(err => {
@@ -68,7 +73,7 @@ const Register = ({ navigation }) => {
           
         }
         else {
-            toast.show("email and password must be filled!", {
+            toast.show("All fields must be filled!", {
                 type: "danger",
                 placement: "bottom",
                 duration: 2900,
@@ -118,7 +123,9 @@ const Register = ({ navigation }) => {
                   fontSize:20
     }}> Register </Text>
       </View>
-      
+          <View style={{width:'100%', marginTop:20, height:'75%'}}>
+              <ScrollView>
+                  
           <View style={{ width: '100%' }}>
               <SpinnerModal showModal={showModal} title="Please wait..." />
               <TextInput
@@ -137,13 +144,27 @@ const Register = ({ navigation }) => {
           width: '90%',
           alignSelf: 'center',
           marginTop:20   
-        }}
-              onChangeText={text => setLandlordPhoneNumber(text)}
+                  }}
+                  onChangeText={text => {
+                    if (text.toString().substr(0, 4) === '+254') {
+                      setLandlordPhoneNumber(text.toString().substr(4));
+                    }
+                    else if (text.toString().substr(0, 3) === '254') {
+                      setLandlordPhoneNumber(text.toString().substr(3));
+                    }
+                    else if (text.toString().substr(0, 1) === '0') {
+                      setLandlordPhoneNumber(text.toString().substr(1));
+                    }
+                
+                    else {
+                      setLandlordPhoneNumber(text); 
+                    }
+                  }}
+             
               label="Landlord Phone Number"
               value={LandlordPhoneNumber}
                   mode="outlined"
-                  keyboardType='numeric'
-              
+                  keyboardType='numeric'   
           />    
        <TextInput
         style={{
@@ -210,7 +231,9 @@ const Register = ({ navigation }) => {
                   </TouchableOpacity>
                   
                   <TouchableOpacity
-                      onPress={()=>navigation.navigate("Login")}
+                       onPress={() => {
+                        dispatch(Add_Auth_Screen_Action("Login"))   
+                      }}
                       style={{ marginTop: 20, width: '70%', alignSelf: 'center', borderBottomColor: 'blue', borderBottomWidth: 1, }}>
                       <Text style={{color:"blue",textAlign:'center' }}>
                           Already  Have an Account ? Login here
@@ -218,6 +241,8 @@ const Register = ({ navigation }) => {
                   </TouchableOpacity>
           </View>
   </View>
+              </ScrollView>
+      </View>
       
     </View>
   )

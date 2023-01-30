@@ -11,13 +11,7 @@ const TopBtns = ({navigation}) => {
                   ,color:'white'
               }}>Details</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navBtn} onPress={()=>navigation.navigate("SingleTenantBalances")}>
-              <Text style={{
-                  fontSize: 15,
-                  fontWeight: '800',
-                  color: 'white'
-              }}>Balance</Text>
-          </TouchableOpacity>
+        
           <TouchableOpacity style={styles.navBtn} onPress={()=>navigation.navigate("PaymentsHistory")}>
               <Text style={{
                   fontSize: 15,

@@ -49,6 +49,7 @@ import {PersistGate} from 'redux-persist/integration/react';
 import { createStore } from 'redux';
 import AllReducers from './src/redux/AllReducers';
 import Routes from './Routes';
+import AuthScreenController from './AuthScreenController';
 const Stack = createNativeStackNavigator();
 
 const App= () => {
@@ -65,17 +66,20 @@ const App= () => {
 
 
   return (  
+    <NavigationContainer>
+
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor} >
     <PaperProvider>
       <ToastProvider>
-        <Routes />
+        <AuthScreenController />
       </ToastProvider>  
     
     </PaperProvider>
       </PersistGate>
 
-    </Provider>
+      </Provider>
+      </NavigationContainer>
   );
 };
 

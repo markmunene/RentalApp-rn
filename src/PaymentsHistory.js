@@ -1,13 +1,70 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, FlatList } from 'react-native'
 import React from 'react'
 import { FAB } from 'react-native-paper'
 import Header from './Header'
 import TopBtns from './TopBtns'
 import Share from 'react-native-share';
+import firestore from '@react-native-firebase/firestore'
+import { useSelector, useDispatch } from 'react-redux';
+import SpinnerModal from './SpinnerModal';
+import { useToast } from 'react-native-toast-notifications';
+import moment from 'moment/moment'
 
 const PaymentsHistory = ({ navigation }) => {
-   
-   
+    const toast = useToast();
+    const dispatch = useDispatch();
+    const SingleTenant = useSelector(state => state.Tenants.SingleTeanants);
+    const Transactions = useSelector(state => state.Tenants.Transactions);
+//    console.log(Transactions);
+    let Landlord = useSelector(state => state.Landlord.Authenticated_landlord);
+    
+    let options = {
+        title: "Share via whatsapp",
+        message: `Dear ${SingleTenant[0].Tenant} You have a Balance of
+         ${SingleTenant[0].Balance} Please Clear Your Balance. with Regards ${Landlord[0].OwnerName} LandLord Thank You`,
+       
+        social: Share.Social.WHATSAPP,
+        whatsAppNumber: `254${SingleTenant[0].PhoneNumber}`,
+        filename: 'files.pdf',
+    }
+    const HandleremiderSending = async () => {
+        
+        await Share.shareSingle(options)
+         .then((res) => {
+           console.log(res);
+         })
+         .catch((err) => {
+           err && console.log(err);
+         });
+     }
+    const RenderItem = ({ item }) => {
+        return (
+            <View style={styles.BioWrapper}>
+                <View style={{width:'60%'}}>
+              <Text style={{
+                  color: 'black',
+                  fontSize:18
+              }}>
+                  {item.RentAmount}
+                    </Text>
+                    <Text style={{
+                  color: 'black',
+                  fontSize:14
+              }}>
+                Payment method::  {item?.PaymentMethod}
+              </Text>
+
+                </View>
+              <Text style={{
+                  color: 'grey',
+                  fontSize:18
+              }}>
+                  {moment(item.CreatedAt).format("DDMMMYY")}
+              </Text>
+          </View>
+        )
+    }
+  
   return (
       <View style={styles.container}>
             <View style={{
@@ -32,30 +89,27 @@ const PaymentsHistory = ({ navigation }) => {
                   color: 'black',
                   fontSize:18
               }}>
-                  Jan 2023
+                  {moment().format("MMMYY")}
               </Text>
               <Text style={{
                   color: 'grey',
                   fontSize:18, fontWeight:'800'
               }}>
-                  Balance : 100000
+                  Balance : {SingleTenant[0].Balance}
               </Text>
           </View>
-          <View style={styles.BioWrapper}>
-              <Text style={{
-                  color: 'black',
-                  fontSize:18
-              }}>
-                  7000
-              </Text>
-              <Text style={{
-                  color: 'grey',
-                  fontSize:18
-              }}>
-                  12/01/2023:12.44pm
-              </Text>
-          </View>
+          <FlatList
+              data={Transactions}
+              renderItem={RenderItem}
+              keyExtractor={(item)=>  item?.CreatedAt + item?.id }
+          
+          />
         
+        <FAB
+       icon="share"
+       style={styles.fabStyle2}
+       onPress={()=>HandleremiderSending()}
+   />
           <FAB
               icon="plus"
               style={styles.fabStyle}
@@ -79,6 +133,12 @@ const styles = StyleSheet.create({
         right: 16,
         position: 'absolute',
     },
+    fabStyle2: {
+        bottom: 100,
+        right: 16,
+        position: 'absolute',
+    },
+
     BioWrapper: {
         width: '100%',
         flexDirection: 'row',

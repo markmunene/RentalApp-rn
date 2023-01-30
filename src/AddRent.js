@@ -1,19 +1,43 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Button, TextInput } from 'react-native-paper';
 import DropDown from "react-native-paper-dropdown";
 import Header from './Header';
 import DatePicker from 'react-native-modern-datepicker';
+import firestore from '@react-native-firebase/firestore'
+import { useSelector, useDispatch } from 'react-redux';
+import SpinnerModal from './SpinnerModal';
+import { useToast } from 'react-native-toast-notifications';
+import { Add_New_Transaction_Action , Update_Tenant_By_Name_Action} from './redux/TenanantsReducer';
 
 
-const AddRent = ({navigation}) => {
+
+const AddRent = ({ navigation }) => {
+  const toast = useToast();
+  const dispatch = useDispatch();
+
+  const SingleTenant = useSelector(state => state.Tenants.SingleTeanants);
+  let Landlord = useSelector(state => state.Landlord.Authenticated_landlord);
+
+  useEffect(() => {
+    setTenant(SingleTenant[0].Tenant);
+  
+    return () => {
+      
+    }
+  }, []);
+
     const [RentAmount, setRentAmount] = useState();
     const [showDropDown, setShowDropDown] = useState(false);
   const [Tenant, setTenant] = useState("");
+  const [PaymentMethod, setPaymentMethod] = useState("");
+
   const [Month, setMonth] = useState("");
   
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
 
   const showPicker = useCallback((value) => setShow(value), []);
 
@@ -24,7 +48,78 @@ const AddRent = ({navigation}) => {
       setDate(selectedDate);
       setMonth(selectedDate)
    
+  }
+  
+  const HandleAddRent =  async() => {
+    if (PaymentMethod != "" && RentAmount !== "") {
+      setShowModal(true)
+     
+      let TotalCash = Number(RentAmount) + Number(SingleTenant[0].OverDraft);
+      if (SingleTenant[0].Balance > TotalCash) {
+
+        
+        
+        await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("tenants").doc(SingleTenant[0].id).update({
+          Balance: SingleTenant[0].Balance - TotalCash
+        });
+        dispatch(Update_Tenant_By_Name_Action({
+          ...SingleTenant[0],
+          Balance: SingleTenant[0].Balance - TotalCash
+        }))
+        
+      } else {
+        let totalOverdraft = TotalCash- SingleTenant[0].Balance
+        await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("tenants").doc(SingleTenant[0].id).update({
+          Balance: 0,
+          OverDraft : totalOverdraft > 0 ? totalOverdraft: 0
+        })
+        dispatch(Update_Tenant_By_Name_Action({
+          ...SingleTenant[0],
+          Balance: 0,
+          OverDraft :totalOverdraft > 0 ? totalOverdraft: 0
+        }))
+      
+        
+      }
+      let Data = {
+       
+        CreatedAt: Date.now(),
+        Tenant: SingleTenant[0].id,
+        RentAmount,
+        PaymentMethod,
+      }
+      await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("Transactions")
+        .doc(SingleTenant[0].id).collection("rent").add({
+        ...Data
+        }).then((res) => {
+          // setMonth("");
+          setRentAmount("");
+          setPaymentMethod("")
+          toast.show("Balance Updated Successfully", {
+            type: "success",
+            placement: "bottom",
+            duration: 2400,
+            offset: 30,
+            animationType: "zoom-in",
+          });
+          navigation.navigate("BottomNavigationScreen")
+          setShowModal(false);
+          dispatch(Add_New_Transaction_Action({ ...Data }));
+      })
+      
+    } else {
+      toast.show("All fields must be Filled", {
+    
+        type: "danger",
+        placement: "bottom",
+        duration: 2900,
+        offset: 30,
+        animationType: "zoom-in",
+    
+    })
+      
     }
+  }
  
   
   return (
@@ -37,7 +132,10 @@ const AddRent = ({navigation}) => {
         <Header Title="Add Rent" iconName="arrow-left-bold" navigation={navigation}  />
 
       </View>
-     
+      <View style={{height:'10%'}}>
+     <SpinnerModal title="Please wait..." showModal={showModal} />
+
+      </View>
            {/* <DropDown
               label={"Gender"}
               mode={"outlined"}
@@ -70,10 +168,23 @@ const AddRent = ({navigation}) => {
         }}
               onChangeText={text => setRentAmount(text)}
               label="Amount Paid"
-              value={RentAmount}
+        value={RentAmount}
+        keyboardType="numeric"
               mode="outlined"
       />
-       <View style={{ width: '50%', alignSelf: 'center',  justifyContent:'center', alignItems:'center', elevation:200, zIndex:900}}>
+       <TextInput
+        style={{
+          width: '90%',
+          alignSelf: 'center',
+          marginTop:20
+          
+        }}
+              onChangeText={text => setPaymentMethod(text)}
+              label="Payment Method"
+              value={PaymentMethod}
+              mode="outlined"
+      />
+       {/* <View style={{ width: '50%', alignSelf: 'center',  justifyContent:'center', alignItems:'center', elevation:200, zIndex:900}}>
         {show && (
         <DatePicker
                 mode="monthYear"
@@ -117,25 +228,16 @@ const AddRent = ({navigation}) => {
         }}>
           Month {Month}
         </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
-      <TextInput
-        style={{
-          width: '90%',
-          alignSelf: 'center',
-          marginTop:20
-          
-        }}
-              onChangeText={text => setRentAmount(text)}
-              label="Date recieved"
-              value={RentAmount}
-              mode="outlined"
-      />
+      
       <Button icon="plus" mode='contained' style={{
         width: '50%',
         marginTop: 20, 
         backgroundColor:'grey'
-      }}>
+      }}
+        onPress={HandleAddRent}
+      >
         Save
       </Button>
       

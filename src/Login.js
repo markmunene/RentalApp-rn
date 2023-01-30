@@ -2,32 +2,53 @@
 // SHA1: 57:09:A4:68:76:F9:CB:FD:07:9D:7C:87:18:20:E0:50:7C:3D:BA:88
 // SHA-256: 85:8C:06:F4:8A:82:02:09:17:99:CE:29:92:65:92:F0:D3:60:12:40:7F:25:3D:E2:0B:8F:09:AB:77:EF:AC:CA
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, TextInput } from 'react-native-paper';
 // import DropDown from "react-native-paper-dropdown";
 import Header from './Header';
-import auth from '@react-native-firebase/auth'
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+
 import Icon from  'react-native-vector-icons/MaterialCommunityIcons'
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useToast } from 'react-native-toast-notifications';
 import SpinnerModal from './SpinnerModal';
+import { useDispatch } from 'react-redux';
+import { Add_Auth_Screen_Action, Add_Auth_Landord_action } from './redux/OwnersReducer';
 
-const Login = ({navigation}) => {
+
+const Login = ({ navigation }) => {
+    
+    const dispatch = useDispatch();
 
   const [Email, setEmail] = useState("");
     const [Password, setPassword] = useState("");
     const [showModal, setshowModal] = useState(false);
 
     const toast = useToast();
+
+    useEffect(() => {
+        dispatch(Add_Auth_Screen_Action("Login"))
+    },[])
     
     const HandleSignUpWithEmail = async() => {
         if (Email != '' && Password !=="") {
             setshowModal(true);    
 
-            await auth().signInWithEmailAndPassword(Email, Password).then(res => {
+            await auth().signInWithEmailAndPassword(Email, Password).then( async res => {
                 setshowModal(false);   
                 setEmail("");
                 setPassword("");
+                await firestore().collection("Owners").doc(res.user.uid).get().then(doc => {
+                    let tempArray = [];
+                    tempArray.push({
+                        ...doc.data(),
+                    })
+                    dispatch(Add_Auth_Landord_action(tempArray));
+                }).catch(err => {
+                    console.log(err);
+                })
+
             }).catch(error => {
                 toast.show(error.code, {
                     type: "danger",
@@ -42,7 +63,7 @@ const Login = ({navigation}) => {
           
         }
         else {
-            toast.show("email and password must be filled!", {
+            toast.show("All fields must be filled!", {
                 type: "danger",
                 placement: "bottom",
                 duration: 2900,
@@ -161,7 +182,9 @@ const Login = ({navigation}) => {
                   </TouchableOpacity>
                   
                   <TouchableOpacity
-                      onPress={()=>navigation.navigate("Register")}
+                      onPress={() => {
+                        dispatch(Add_Auth_Screen_Action("Register"))   
+                      }}
                       style={{ marginTop: 20, width: '70%', alignSelf: 'center', borderBottomColor: 'blue', borderBottomWidth: 1, }}>
                       <Text style={{color:"blue",textAlign:'center' }}>
                           Dont Have an Account ? signUp here

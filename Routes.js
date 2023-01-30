@@ -43,13 +43,12 @@ const Stack = createNativeStackNavigator();
 
 const Routes = () => {
     let Landlord = useSelector(state => state.Landlord.Authenticated_landlord);
-    console.log(Landlord.length);
+    // console.log(Landlord.length);
 
   return (  
   
-      <NavigationContainer>
          
-     <Stack.Navigator initialRouteName={Landlord.length == 0 ? "Login" : "BottomNavigationScreen"}>
+     <Stack.Navigator initialRouteName={Landlord.length == 0 ? "Login" : "Home"}>
             <Stack.Screen name="addrent" component={AddRent} options={{ header: () => null }} />
         <Stack.Screen name="AddRooms" component={AddRooms} options={{header: () => null}} />
         <Stack.Screen name="AddTenant" component={AddTenant} options={{header: () => null}} />
@@ -61,11 +60,10 @@ const Routes = () => {
                 <Stack.Screen name="Register" component={Register} options={{ header: () => null }} />
             <Stack.Screen name="Login" component={Login} options={{ header: () => null }} />
                 
-            <Stack.Screen name="BottomNavigationScreen" component={BottomNavigationScreen} options={{ header: () => null }} />
+            {/* <Stack.Screen name="BottomNavigationScreen" component={BottomNavigationScreen} options={{ header: () => null }} /> */}
  
       </Stack.Navigator>
-    </NavigationContainer>
-       
+
     
   );
 };
