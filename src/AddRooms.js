@@ -23,7 +23,7 @@ const AddRooms = ({ navigation }) => {
   let properties = useSelector(state => state.Propertys.AllProperties);
   let SingleProperty = useSelector(state => state.Propertys.SingleProperty);
 
-
+console.log(SingleProperty, "am called men");
 
   useEffect(() => {
    dispatch(Add_Dropdown_Properties_Action())
@@ -75,48 +75,54 @@ const AddRooms = ({ navigation }) => {
 
   const HandleAddNewRoom = async () => {
     // console.log(PropertyName);
-    if (PropertyName !== undefined && RoomNumber !== "") {
-        dispatch(Filter_SingleProperty_By_Id_Action(PropertyName.value))
-   
-      let Rooms1 =  SingleProperty[0].Rooms ;
-      Rooms1.push({
-        PropertyName: PropertyName.label,
-        RoomNumber
-      })
-      // console.log(Rooms1);
-      
+ try {
+  if (PropertyName !== undefined && RoomNumber !== "") {
+      console.log(PropertyName);
+    let Rooms1 =  SingleProperty[0].Rooms ;
+    Rooms1.push({
+      PropertyName: PropertyName.label,
+      RoomNumber
+    })
+    // console.log(Rooms1);
+    
 
-      await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("property").doc(PropertyName.value).update({
+    await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("property").doc(PropertyName.value).update({
+      Rooms:Rooms1
+    }).then(res => {
+      
+      // dispatch(Filter_SingleProperty_By_Id_Action(PropertyName.value))
+      dispatch(Add_New_Room_Action({
+        ...SingleProperty[0],
         Rooms:Rooms1
-      }).then(res => {
-        
-        dispatch(Add_New_Room_Action({
-          ...SingleProperty[0],
-          "Rooms":Rooms1
 
-        }));
-        setRoomNumber("");
+      }));
+      // setPropertyName(undefined)
+      setRoomNumber("");
 
-        setPropertyName("");
-        toast.show("Room Created Successfully", {
-          type: "success",
-          placement: "bottom",
-          duration: 2400,
-          offset: 30,
-          animationType: "zoom-in",
-        });
-      })
-      
-    }
-    else {
-      toast.show("All fields must be filled!", {
-        type: "danger",
+      toast.show("Room Created Successfully", {
+        type: "success",
         placement: "bottom",
-        duration: 2900,
+        duration: 2400,
         offset: 30,
         animationType: "zoom-in",
-    });
-    }
+      });
+    }).catch(err => {
+      console.log(err);
+    })
+    
+  }
+  else {
+    toast.show("All fields must be filled!", {
+      type: "danger",
+      placement: "bottom",
+      duration: 2900,
+      offset: 30,
+      animationType: "zoom-in",
+  });
+  }
+ } catch (error) {
+  console.log(error);
+ }
 
     
   }

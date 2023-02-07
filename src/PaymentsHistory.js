@@ -101,7 +101,7 @@ const PaymentsHistory = ({ navigation }) => {
           <FlatList
               data={Transactions}
               renderItem={RenderItem}
-              keyExtractor={(item)=>  item?.CreatedAt + item?.id }
+              keyExtractor={(item)=>  item?.CreatedAt }
           
           />
         

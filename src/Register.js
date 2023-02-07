@@ -78,7 +78,7 @@ const Register = ({ navigation }) => {
                 placement: "bottom",
                 duration: 2900,
                 offset: 30,
-                animationType: "zoom-in",
+                animationType: "zoom-in", 
             });
         }
     }
@@ -88,7 +88,7 @@ const Register = ({ navigation }) => {
   await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
   // Get the users ID token
         const  idToken  = await GoogleSignin.signIn();
-        console.log(idToken);
+        // console.log(idToken);
 
   // Create a Google credential with the token
 //         const googleCredential = auth.GoogleAuthProvider.credential(idToken);
@@ -99,7 +99,8 @@ const Register = ({ navigation }) => {
         
         
 
-        console.log(auth().currentUser);
+        // console.log(auth().currentUser);
+      // auth().sendPasswordResetEmail(ennn, auth())
     }
 
   return (
@@ -117,7 +118,7 @@ const Register = ({ navigation }) => {
 <Text style={{
                   fontWeight: '900',
                   fontSize:20
-              }}> QuickShift Rentals </Text>
+              }}> Landlord Calc </Text>
 <Text style={{
                   fontWeight: '900',
                   fontSize:20

@@ -1,11 +1,12 @@
-import { StyleSheet, Text, TouchableOpacity, View, FlatList } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, FlatList, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { Button, TextInput } from 'react-native-paper';
 import DropDown from "react-native-paper-dropdown";
 import Header from './Header';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { Add_New_Property_Action } from './redux/PropertyReducer';
+import Icon from 'react-native-vector-icons/Ionicons'
+import { Add_New_Property_Action, Delete_Property_Action } from './redux/PropertyReducer';
 import firestore from '@react-native-firebase/firestore'
 import { useToast } from 'react-native-toast-notifications';
 
@@ -57,6 +58,44 @@ const AddProperty = ({ navigation }) => {
     }
     
   }
+  const HandleDeleteProperty =  async (item) => {
+    
+    Alert.alert(
+      'Delete action confirmation',
+      'Are  u sure you want to delete this property',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log("nah"),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            try {
+              await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("property").doc(item.id)
+                .delete().then(res => {
+                  console.log(res);
+                  dispatch(Delete_Property_Action(item))
+                  toast.show("Property Deleted Successfully", {
+                    type: "danger",
+                    placement: "bottom",
+                    duration: 2400,
+                    offset: 30,
+                    animationType: "zoom-in",
+                  });
+                  
+              })
+           
+            } catch (error) {
+              console.log('fire ', error);
+            }
+          },
+        },
+      ],
+    );
+  
+  }
 
   const RenderItem = ({ item }) => {
     return (
@@ -79,13 +118,28 @@ const AddProperty = ({ navigation }) => {
               property
                 </Text>
         </View>
+        <TouchableOpacity
+          style={{
+            width: '20%',
+            justifyContent: 'center',
+            alignItems: 'center',
+
+            
+          }}
+          onPress={()=> HandleDeleteProperty(item)}
+        >
+          <Icon name="trash" size={25} color="red" style={{
+            alignSelf:'flex-start'
+          }} />
+        </TouchableOpacity>
         <View style={{
-         
+         width:'40%'
         }}>
           <Text style={{
               color: 'grey',
             fontSize: 18,
-            fontWeight: '900'
+            fontWeight: '900',
+            alignSelf:'flex-end'
           }}>
               {item.Location}
           </Text>

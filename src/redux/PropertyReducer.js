@@ -28,9 +28,16 @@ export default function PropertyReducer(state = initialState, action) {
                 // something cool
                 let property = action.payload;
                 tempproperties.push(property);
+                let tempproperties1 = tempproperties.map(item => {
+                    return {
+                        label: item.PropertyName,
+                        value:item.id
+                      }
+                  });
                 return {
                     ...state,
                     AllProperties: Object.assign([], tempproperties),
+                    DropdownProperties: Object.assign([], tempproperties1),
                 }
             }
         case actions.Add_Drop_Down_Properties_Action:
@@ -56,13 +63,19 @@ export default function PropertyReducer(state = initialState, action) {
     
                 
                 let room = action.payload;
-                // tempproperties.push(room);
+                let tempsingle = [];
+                tempsingle.push(room)
+                // tempproperties.push(room); 
                 let tempproperties1 = tempproperties.filter(item => item.id !== room.id);
-                tempproperties1.push(room)
-    
+                tempproperties1.unshift(room)
+    // console.log(room);
                 return {
                     ...state,
                     AllProperties: Object.assign([], tempproperties1),
+                    PropertiesForFilter: Object.assign([], tempproperties1),
+                    SingleProperty:Object.assign([], tempsingle),
+
+
             }
 }
         case actions.PropertyRooms_Action:
@@ -79,6 +92,7 @@ export default function PropertyReducer(state = initialState, action) {
             return {
                 ...state,
                 DropdownProperties: Object.assign([], tempropeties),
+
                 }
             }
         case actions.Filter_SingleProperty_By_Id_Action:
@@ -97,11 +111,28 @@ export default function PropertyReducer(state = initialState, action) {
                     SingleProperty: Object.assign([], tempropeties),
                     }
             }
+            case actions.Delete_Property_Action:
+                {
+                let { PropertiesForFilter } = state;
+        
+                    let properties = PropertiesForFilter.slice();
+                    let property = action.payload;
+                let tempropeties =   properties.filter(item=> item.id != property.id)
+                   
+                return {
+                    ...state,
+                    AllProperties: Object.assign([], tempropeties),
+                    }
+            }
         default:
             return state
     }
 
 }
+export const Delete_Property_Action = (data) => ({
+    type: actions.Delete_Property_Action,
+    payload: data
+});
 export const Add_New_Property_Action = (data) => ({
     type: actions.Add_New_Property,
     payload: data

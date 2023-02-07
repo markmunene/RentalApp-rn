@@ -38,14 +38,14 @@ const Home = ({ navigation }) => {
     const [ProgressState, setProgressState] = useState(0);
     const [selected, setSelected] = useState(undefined);
   
-    useEffect(() => {
+    // useEffect(() => {
         
-        dispatch(Get_All_Properties_Action({ OwnerId: Landlord[0].OwnerId }))
-        dispatch(Get_All_tenants_Action({ OwnerId: Landlord[0].OwnerId }));
+    //     dispatch(Get_All_Properties_Action({ OwnerId: Landlord[0].OwnerId }))
+    //     dispatch(Get_All_tenants_Action({ OwnerId: Landlord[0].OwnerId }));
 
       
         
-    }, []);
+    // }, []);
     useEffect(() => {
         // console.log(AllTenants);
         let tempPaidBalance = AllTenants.reduce((a, b) => {
@@ -57,7 +57,13 @@ const Home = ({ navigation }) => {
         }, 0)
         setActulaBalanceState(tempActualBalance);
         setPaidBalanceState(tempPaidBalance);
-        setProgressState((tempActualBalance - tempPaidBalance)/tempActualBalance)
+        if (tempActualBalance>0) {
+        
+            setProgressState((tempActualBalance - tempPaidBalance) / tempActualBalance);
+        } else {
+            setProgressState(0);
+            
+        }
       
     
       return () => {
@@ -176,7 +182,7 @@ const Home = ({ navigation }) => {
            
 
         } else {
-            console.log("naskia");
+            // console.log("naskia");
 
            await AsyncStorage.setItem("storedMonth", JSON.stringify(month))
 
@@ -192,7 +198,7 @@ const Home = ({ navigation }) => {
         
         }
     }, []);
-    console.log("amcalled, amback");
+    // console.log("amcalled, amback");
 
     
   return (

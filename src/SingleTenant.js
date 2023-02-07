@@ -1,10 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View ,Alert, TouchableOpacity} from 'react-native'
 import React,{useState, useEffect} from 'react'
 import Header from './Header'
 import TopBtns from './TopBtns'
 import { useSelector, useDispatch } from 'react-redux';
-import { Filter_Transactions_By_Name_Action,Get_All_Transactions_Action } from './redux/TenanantsReducer';
+import firestore from '@react-native-firebase/firestore'
+import Icon from 'react-native-vector-icons/Ionicons'
+
+
+import { Filter_Transactions_By_Name_Action,Get_All_Transactions_Action, Delete_Tenant_Action } from './redux/TenanantsReducer';
+import { useToast } from 'react-native-toast-notifications';
 const SingleTenant = ({ navigation }) => {
+    const toast = useToast();
     const SingleTenant = useSelector(state => state.Tenants.SingleTeanants);
     let Landlord = useSelector(state => state.Landlord.Authenticated_landlord);
    
@@ -16,11 +22,58 @@ const SingleTenant = ({ navigation }) => {
         dispatch(Get_All_Transactions_Action({
             OwnerId: Landlord[0].OwnerId,
             id: SingleTenant[0].id
-      }))
+        }))
     
-      return () => {   
+        return () => {
+        }
+    }, []);
+
+    const HandleDeleteProperty =  async () => {
+    
+        Alert.alert(
+          'Delete action confirmation',
+          'Are  u sure you want to delete this Tenant',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => console.log("nah"),
+              style: 'cancel',
+            },
+            {
+              text: 'OK',
+              onPress: async () => {
+                  try {
+                    // delete Transactions
+                    await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("Transactions")
+                        .doc(SingleTenant[0].id).collection("rent").get().then(res => {
+                            Promise.all(res.docs.map(doc => doc.ref.delete()));
+                            console.log("docs dead");
+                         })
+                      
+                  await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("tenants").doc(SingleTenant[0].id)
+                    .delete().then(res => {
+                     
+                      dispatch(Delete_Tenant_Action(SingleTenant[0]))
+                      toast.show("Tenant Deleted Successfully", {
+                        type: "danger",
+                        placement: "bottom",
+                        duration: 2400,
+                        offset: 30,
+                        animationType: "zoom-in",
+                      });
+                        navigation.goBack();
+                      
+                  })
+               
+                } catch (error) {
+                  console.log('fire ', error);
+                }
+              },
+            },
+          ],
+        );
+      
       }
-    }, [])
   return (
       <View style={styles.container}>
           <View style={{
@@ -45,9 +98,18 @@ const SingleTenant = ({ navigation }) => {
               height: 130,
               backgroundColor: '#ffe6e6',
               padding: 20, 
-              justifyContent:'center'
+              flexDirection: 'row',
+            justifyContent:'space-between',
+             
               
           }}>
+              <View  style={{
+           
+           justifyContent: 'center',
+           alignItems: 'center',
+
+           
+         }}>
               <Text style={{
                   fontWeight: '900',
                   fontSize: 28,
@@ -58,10 +120,26 @@ const SingleTenant = ({ navigation }) => {
               <Text style={{
                   fontWeight: '800',
                   fontSize: 16,
-                  color:'black'
+                      color: 'black',
+                  alignSelf:'flex-start'
               }}>
                   {SingleTenant[0].leaseStarts}
               </Text>
+              </View>
+              <TouchableOpacity
+          style={{
+           
+            justifyContent: 'center',
+            alignItems: 'center',
+
+            
+          }}
+          onPress={()=> HandleDeleteProperty()}
+        >
+          <Icon name="trash" size={40} color="red" style={{
+            alignSelf:'flex-start'
+          }} />
+        </TouchableOpacity>
               
           </View>
           {/* bio section  */}

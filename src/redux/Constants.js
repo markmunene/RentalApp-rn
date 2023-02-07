@@ -23,3 +23,7 @@ export const Get_All_Tenants_Action = "Get_All_Tenants_Action";
 export const Filter_Tenant_By_Name_Action = "Filter_Tenant_By_Name_Action";
 export const Filter_SingleTenant_By_Id_Action = "Filter_SingleTenant_By_Id_Action";
 export const Filter_Transactions_By_Name_Action = "Filter_Transactions_By_Name_Action";
+export const Delete_Tenant_Action = "Delete_Tenant_Action";
+export const Delete_Property_Action = "Delete_Property_Action";
+
+

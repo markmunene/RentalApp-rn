@@ -107,7 +107,7 @@ const Login = ({ navigation }) => {
 <Text style={{
                   fontWeight: '900',
                   fontSize:20
-              }}> QuickShift Rentals </Text>
+              }}> Landlord Calc </Text>
     <Text style={{
                   fontWeight: '900',
                   fontSize:20

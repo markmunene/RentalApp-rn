@@ -176,6 +176,21 @@ export default function TenantReducer (state = initialState, action) {
                            TenantsForFilter: Object.assign([], tempTenant1),
                            }
             }
+            case actions.Delete_Tenant_Action:
+                {
+                   let { TenantsForFilter } = state;
+                   let tempTenant12 = TenantsForFilter.slice();
+                   let Tenant = action.payload;
+                  
+                   let tempTenant1 = tempTenant12.filter(item => item.id !== Tenant.id);
+                       
+                   return {
+                              ...state,
+                              
+                              Tenants: Object.assign([], tempTenant1),
+                              
+                              }
+               }
         default:
             return state
     }
@@ -184,6 +199,11 @@ export default function TenantReducer (state = initialState, action) {
 
 export const Add_New_Transaction_Action = (data) => ({
     type: actions.Add_New_Transaction_Action,
+    payload: data
+});
+
+export const Delete_Tenant_Action = (data) => ({
+    type: actions.Delete_Tenant_Action,
     payload: data
 });
 export const Add_New_Tenant_Action = (data) => ({

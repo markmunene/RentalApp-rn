@@ -102,7 +102,7 @@ const AddRent = ({ navigation }) => {
             offset: 30,
             animationType: "zoom-in",
           });
-          navigation.navigate("BottomNavigationScreen")
+          navigation.goBack();
           setShowModal(false);
           dispatch(Add_New_Transaction_Action({ ...Data }));
       })
