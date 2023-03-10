@@ -55,12 +55,14 @@ const Home = ({ navigation }) => {
         let tempActualBalance = AllTenants.reduce((a, b) => {
             return Number(b.RentalFees) + a;  
         }, 0)
+       
         setActulaBalanceState(tempActualBalance);
         setPaidBalanceState(tempPaidBalance);
         if (tempActualBalance>0) {
         
             setProgressState((tempActualBalance - tempPaidBalance) / tempActualBalance);
         } else {
+          
             setProgressState(0);
             
         }
@@ -367,7 +369,7 @@ const Home = ({ navigation }) => {
                       }}>Collected</Text>
                       <Text style={{fontWeight: '900',
                       fontSize:16}}>
-                          Ksh {ActulaBalanceState - PaidBalanceState}
+                          Ksh {  ActulaBalanceState > PaidBalanceState ? ActulaBalanceState - PaidBalanceState: 0}
                       </Text>
                   </View>
                   <View>

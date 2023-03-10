@@ -101,12 +101,11 @@ const PaymentsHistory = ({ navigation }) => {
           <FlatList
               data={Transactions}
               renderItem={RenderItem}
-              keyExtractor={(item)=>  item?.CreatedAt }
-          
+              keyExtractor={(item) => item?.CreatedAt}
           />
         
         <FAB
-       icon="share"
+       icon="whatsapp"
        style={styles.fabStyle2}
        onPress={()=>HandleremiderSending()}
    />

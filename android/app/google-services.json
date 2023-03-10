@@ -14,14 +14,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "249335707071-b4debiveh0rbhgveplstf29pskh27qor.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.rentalapp",
-            "certificate_hash": "5709a46876f9cbfd079d7c871820e0507c3dba88"
-          }
-        },
-        {
           "client_id": "249335707071-7rmu11nusrjsa5qq8jb5u4p1t2qks36p.apps.googleusercontent.com",
           "client_type": 3
         }

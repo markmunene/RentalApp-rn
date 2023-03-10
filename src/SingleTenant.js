@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import firestore from '@react-native-firebase/firestore'
 import Icon from 'react-native-vector-icons/Ionicons'
 
+import { FAB } from 'react-native-paper'
 
 import { Filter_Transactions_By_Name_Action,Get_All_Transactions_Action, Delete_Tenant_Action } from './redux/TenanantsReducer';
 import { useToast } from 'react-native-toast-notifications';
@@ -231,6 +232,11 @@ const SingleTenant = ({ navigation }) => {
                 {SingleTenant[0].deposit}
               </Text>
           </View>
+          <FAB
+              icon="plus"
+              style={styles.fabStyle}
+              onPress={()=>navigation.navigate("addrent")}
+          />
         
     </View>
   )
@@ -245,6 +251,11 @@ const styles = StyleSheet.create({
        height: '100%',
         width:'100%'
     },
+    fabStyle: {
+        bottom: 16,
+        right: 16,
+        position: 'absolute',
+    }, 
     BioWrapper: {
         width: '100%',
         flexDirection: 'row',

@@ -74,8 +74,6 @@ export default function PropertyReducer(state = initialState, action) {
                     AllProperties: Object.assign([], tempproperties1),
                     PropertiesForFilter: Object.assign([], tempproperties1),
                     SingleProperty:Object.assign([], tempsingle),
-
-
             }
 }
         case actions.PropertyRooms_Action:

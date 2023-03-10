@@ -9,7 +9,9 @@ import Header from './Header';
 import auth from '@react-native-firebase/auth'
 import firestore from '@react-native-firebase/firestore'
 import Icon from  'react-native-vector-icons/MaterialCommunityIcons'
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+// import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
+
 import { useToast } from 'react-native-toast-notifications';
 import SpinnerModal from './SpinnerModal';
 import { useDispatch } from 'react-redux';
@@ -87,7 +89,8 @@ const Register = ({ navigation }) => {
          // Check if your device supports Google Play
   await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
   // Get the users ID token
-        const  idToken  = await GoogleSignin.signIn();
+      const idToken = await GoogleSignin.signIn();
+      setEmail(idToken.user.email)
         // console.log(idToken);
 
   // Create a Google credential with the token

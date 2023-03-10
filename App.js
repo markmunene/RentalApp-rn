@@ -37,7 +37,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import thunk from 'redux-thunk';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+// import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 
 
 
@@ -54,31 +55,23 @@ const Stack = createNativeStackNavigator();
 
 const App= () => {
   let store = createStore(AllReducers, applyMiddleware(thunk))
-  GoogleSignin.configure(
-    {
-      webClientId: '249335707071-7rmu11nusrjsa5qq8jb5u4p1t2qks36p.apps.googleusercontent.com',
-      offlineAccess :true
-  
-}
-  );
+  GoogleSignin.configure();
+ 
   
   let persistor = persistStore(store)
 
 
   return (  
     <NavigationContainer>
-
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor} >
     <PaperProvider>
       <ToastProvider>
         <AuthScreenController />
       </ToastProvider>  
-    
     </PaperProvider>
       </PersistGate>
-
-      </Provider>
+    </Provider>
       </NavigationContainer>
   );
 };

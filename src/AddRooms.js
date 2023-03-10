@@ -23,7 +23,7 @@ const AddRooms = ({ navigation }) => {
   let properties = useSelector(state => state.Propertys.AllProperties);
   let SingleProperty = useSelector(state => state.Propertys.SingleProperty);
 
-console.log(SingleProperty, "am called men");
+// console.log(SingleProperty, "am called men");
 
   useEffect(() => {
    dispatch(Add_Dropdown_Properties_Action())
