@@ -16,6 +16,8 @@ export const Update_Tenant_By_Name_Action = "Update_Tenant_By_Name_Action";
 export const Get_All_Transactions_Action = "Get_All_Transactions_Action";
 export const Filter_Tenant_By_Property_Action = "Filter_Tenant_By_Property_Action";
 export const Filter_Tenant_By_BalanceAmount_Action = "Filter_Tenant_By_BalanceAmount_Action";
+export const Update_Property_Action = "Update_Property_Action";
+
 
 
 

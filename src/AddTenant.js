@@ -7,12 +7,15 @@ import SpinnerModal from './SpinnerModal'
 import firestore from '@react-native-firebase/firestore'
 import { useToast } from 'react-native-toast-notifications';
 import { useSelector, useDispatch } from 'react-redux';
-import { Add_New_Tenant_Action } from './redux/TenanantsReducer';
-import { Filter_SingleProperty_By_Id_Action } from './redux/PropertyReducer';
+import { Add_New_Tenant_Action,Update_Tenant_By_Name_Action } from './redux/TenanantsReducer';
+import { Filter_SingleProperty_By_Id_Action
+  
+ } from './redux/PropertyReducer';
 
 import Header from './Header';
 
-const AddTenant = ({ navigation }) => {
+const AddTenant = ({ navigation, route }) => {
+  const NavData = route.params;
   const toast = useToast();
   const dispatch = useDispatch();
   let Landlord = useSelector(state => state.Landlord.Authenticated_landlord);
@@ -25,7 +28,9 @@ const AddTenant = ({ navigation }) => {
     const [Month, setMonth] = useState("");
   const [PhoneNumber, setPhoneNumber] = useState("");
   const [paymentDue, setpaymentDue] = useState("");
-    const [deposit, setdeposit] = useState("");
+  const [deposit, setdeposit] = useState("");
+  const [BalanceState, setBalanceState] = useState("");
+  
   const [leaseStarts, setleaseStarts] = useState("");
   const [occupants, setoccupants] = useState("");
   const [RentalFees, setRentalFees] = useState("");
@@ -35,8 +40,6 @@ const AddTenant = ({ navigation }) => {
   const [RoomsArray, setRoomsArray] = useState("");
   
   const [showModal, setShowModal] = useState(false);
-
-    
     const [date, setDate] = useState(new Date());
     const [show, setShow] = useState(false);
   
@@ -47,12 +50,29 @@ const AddTenant = ({ navigation }) => {
         // setShowspinner(true)
         showPicker(false);
         setDate(selectedDate);
-        setleaseStarts(selectedDate)
-     
+      setleaseStarts(selectedDate);  
   }
-  const Test = () => {
-    console.log("am testing something good");
-  }
+  useEffect(() => {
+    let item = NavData?.item;
+   
+    if ( item != undefined) {
+
+      console.log( item.Balance);
+      setEmail(item.Email);
+      setTenant(item.Tenant);
+      setPhoneNumber(item.PhoneNumber);
+      setpaymentDue(item.paymentDue);
+      setdeposit(item.deposit);
+      setleaseStarts(item.leaseStarts);
+      setoccupants(item.occupants);
+      setRentalFees(item.RentalFees);
+      setBalanceState(item.Balance==0 ? "00":item.Balance.toString() )
+      setRoomNumber(item.RoomNumber);
+      setPropertyName(item.PropertyName);
+      
+    }
+    
+  },[])
 
   useEffect(
     () => {
@@ -120,8 +140,7 @@ const AddTenant = ({ navigation }) => {
           offset: 30,
           animationType: "zoom-in",
         });
-        navigation.navigate("BottomNavigationScreen")
-
+        navigation.goBack();
        }).catch(err => {
         console.log("error", err);
       });
@@ -140,6 +159,77 @@ const AddTenant = ({ navigation }) => {
 }
     
   }
+
+  const HandleUpdateTenant = async () => {
+    if (Tenant !== "" && PhoneNumber !== "" && paymentDue !== "" && deposit !== "" && leaseStarts !== "" && occupants !== "" && RentalFees !== "" && RoomNumber
+      !== "" && PropertyName !== "" && Email !== "") {
+      let newRentalFees = Number(RentalFees) - Number(NavData?.item.RentalFees);
+      let newDeposit = Number(deposit) - Number(NavData?.item.deposit);
+
+      let data = {
+        PropertyName: PropertyName?.label ? PropertyName.label: PropertyName,
+        Tenant,
+        PhoneNumber,
+        paymentDue,
+        deposit,
+        leaseStarts,
+        occupants,
+        RentalFees,
+        Email,
+        Balance: newDeposit + newRentalFees + Number(NavData?.item.Balance),
+        ActualBalance: Number(RentalFees) + Number(deposit),
+        OverDraft: 0,
+        RoomNumber: RoomNumber.value ? RoomNumber.value : RoomNumber,
+        createdAt: Date.now(),
+      }
+    
+      setShowModal(true)
+      await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("tenants").doc(NavData?.item.id).update({
+        ...data,
+      
+      }).then(res => {
+        
+        dispatch(Update_Tenant_By_Name_Action({
+          ...data,
+          id: NavData?.item.id
+        }));
+        setShowModal(false);
+        setEmail("");
+        setTenant("");
+        setPhoneNumber("");
+        setpaymentDue("");
+        setdeposit("");
+        setleaseStarts("");
+        setoccupants("");
+        setRentalFees("");
+        setRoomNumber("");
+        setPropertyName("");
+        toast.show("Tenant updated Successfully", {
+          type: "success",
+          placement: "bottom",
+          duration: 2400,
+          offset: 30,
+          animationType: "zoom-in",
+        });
+        navigation.goBack();
+
+      }).catch(err => {
+        console.log("error", err);
+      });
+
+    } else {
+      toast.show("All fields must be Filled", {
+  
+        type: "danger",
+        placement: "bottom",
+        duration: 2900,
+        offset: 30,
+        animationType: "zoom-in",
+
+      })
+    }
+  }
+
   return (
     <View style={styles.container} >
       <View style={{
@@ -147,21 +237,11 @@ const AddTenant = ({ navigation }) => {
         height: 60
         
       }}>
-        <Header Title="Add Tenant" toHome="home" iconName="arrow-left-bold" showIcons="No" navigation={navigation}  />
+        <Header Title={NavData?.item == undefined ? "Add Tenant": "Update Tenant"} toHome="home" iconName="arrow-left-bold" showIcons="No" navigation={navigation}  />
 
       </View>
       <SpinnerModal showModal={showModal} title="please wait ..." />
-           {/* <DropDown
-              label={"Gender"}
-              mode={"outlined"}
-              visible={showDropDown}
-              showDropDown={() => setShowDropDown(true)}
-              onDismiss={() => setShowDropDown(false)}
-              value={Tenant}
-              setValue={setTenant}
-              list={colorList}
-              contentContainerStyle={{ flex: 1 }} style={{ width: '100%', height: '100%' }}
-            /> */}
+           
       <View style={{
         width: '100%', 
         height: '80%', 
@@ -170,7 +250,7 @@ const AddTenant = ({ navigation }) => {
         
       }}>
 
-      <ScrollView >
+      <ScrollView keyboardShouldPersistTaps={'handled'} >
       <View style={{
           paddingHorizontal: 20,
           justifyContent: 'center',
@@ -369,6 +449,23 @@ const AddTenant = ({ navigation }) => {
               value={deposit}
               mode="outlined"
           />
+          {NavData?.item !== undefined &&
+             <TextInput
+        style={{
+          width: '90%',
+          alignSelf: 'center',
+          marginTop:20
+          
+        }}
+              onChangeText={text => setBalanceState(text)}
+            label="Current Balance"
+          
+              value={BalanceState}
+            mode="outlined"
+          
+          />
+          
+          }
           {/* property name */}
           <View style={{
             width: '100%',
@@ -376,7 +473,7 @@ const AddTenant = ({ navigation }) => {
             alignItems: "center",
             marginVertical:10
           }}>
-            <Dropdown label="Select property" FilterProperty="Filter" data={DropdownProperties} onPress={Test} onSelect={setPropertyName} />
+            <Dropdown  label={NavData?.item ==undefined? "Select property" : "Property:: "+ NavData?.item.PropertyName} FilterProperty="Filter" data={DropdownProperties}  onSelect={setPropertyName} />
             </View>
                 {/* <TextInput
         style={{
@@ -399,7 +496,7 @@ const AddTenant = ({ navigation }) => {
             alignItems: "center",
             marginVertical:10
           }}>
-          <Dropdown data={RoomsArray}   label="select Room" onSelect={setRoomNumber} />
+          <Dropdown data={RoomsArray}   label={NavData?.item ==undefined? "select Room" : "Room:: "+NavData?.item.RoomNumber} onSelect={setRoomNumber} />
          </View>
 
             {/* <TextInput
@@ -423,9 +520,10 @@ const AddTenant = ({ navigation }) => {
            alignSelf:'center'
         
           }}
-            onPress={()=>HandleSaveTenant()}
+            onPress={()=> NavData?.item ==undefined ? HandleSaveTenant(): HandleUpdateTenant()}
           >
-        Save
+            {NavData?.item == undefined ?  "Save": "Update"}
+       
       </Button>
         </ScrollView>
       </View>

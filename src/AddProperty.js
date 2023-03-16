@@ -6,16 +6,21 @@ import Header from './Header';
 
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons'
-import { Add_New_Property_Action, Delete_Property_Action } from './redux/PropertyReducer';
+import Icon2 from 'react-native-vector-icons/FontAwesome'
+
+import { Add_New_Property_Action, Delete_Property_Action, Update_Property_Action } from './redux/PropertyReducer';
 import firestore from '@react-native-firebase/firestore'
 import { useToast } from 'react-native-toast-notifications';
 
-const AddProperty = ({ navigation }) => {
+const AddProperty = ({ navigation, route }) => {
+
   const dispatch = useDispatch();
   const toast = useToast();
-    const [RentAmount, setRentAmount] = useState();
-    const [showDropDown, setShowDropDown] = useState(false);
-    const [PropertyName, setPropertyName] = useState("");
+  const [RentAmount, setRentAmount] = useState();
+  const [UpdateItem, setUpdateItem] = useState(false);
+  const [PropertyName, setPropertyName] = useState("");
+  const [UpdateItems, setUpdateItems] = useState([]);
+
   const [Location, setLocation] = useState("");
   let Landlord = useSelector(state => state.Landlord.Authenticated_landlord);
   let properties = useSelector(state => state.Propertys.AllProperties);
@@ -57,6 +62,53 @@ const AddProperty = ({ navigation }) => {
     });
     }
     
+  }
+  const HandleEditData = (item) => {
+    setPropertyName(item.PropertyName);
+    setLocation(item.Location);
+    setUpdateItem(true);
+
+    setUpdateItems(item)
+  } 
+
+
+  const HandlePropertyUpdate = async () => {
+    if (PropertyName !== "" && Location !== "") {
+      await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("property").doc(UpdateItems.id).update({
+        PropertyName,
+        Location, 
+        Rooms:UpdateItems.Rooms
+      }).then(res => {
+
+        dispatch(Update_Property_Action({
+          Location, 
+          PropertyName, 
+          id: UpdateItems.id, 
+          Rooms:UpdateItems.Rooms
+        }));
+        toast.show("Property Updated Successfully", {
+          type: "success",
+          placement: "bottom",
+          duration: 2400,
+          offset: 30,
+          animationType: "zoom-in",
+        });
+        setLocation("");
+        setPropertyName("");
+        setUpdateItem(false);
+        setUpdateItems([])
+      })
+      
+    }
+    else {
+      toast.show("All fields must be filled!", {
+        type: "danger",
+        placement: "bottom",
+        duration: 2900,
+        offset: 30,
+        animationType: "zoom-in",
+    });
+    }
   }
   const HandleDeleteProperty =  async (item) => {
     
@@ -100,7 +152,7 @@ const AddProperty = ({ navigation }) => {
   const RenderItem = ({ item }) => {
     return (
         <View style={styles.BioWrapper}>
-        <View style={{ width: '40%' }}>
+        <View style={{ width: '35%' }}>
        
           <Text style={{
               color: 'black',
@@ -118,9 +170,13 @@ const AddProperty = ({ navigation }) => {
               property
                 </Text>
         </View>
+        <View style={{
+          flexDirection: 'row',
+          width:'30%'
+        }}>
         <TouchableOpacity
           style={{
-            width: '20%',
+          
             justifyContent: 'center',
             alignItems: 'center',
 
@@ -131,9 +187,27 @@ const AddProperty = ({ navigation }) => {
           <Icon name="trash" size={25} color="red" style={{
             alignSelf:'flex-start'
           }} />
-        </TouchableOpacity>
+          </TouchableOpacity>
+          <TouchableOpacity
+          style={{
+          
+            justifyContent: 'center',
+              alignItems: 'center',
+            marginLeft:20
+
+            
+          }}
+          onPress={()=> HandleEditData(item)}
+        >
+          <Icon2 name="edit" size={30} color="green" style={{
+            alignSelf:'flex-start'
+          }} />
+          </TouchableOpacity>
+          
+
+        </View>
         <View style={{
-         width:'40%'
+         width:'35%'
         }}>
           <Text style={{
               color: 'grey',
@@ -155,10 +229,7 @@ const AddProperty = ({ navigation }) => {
         </View>
       </View>
     )
-}
-
-
-    
+}   
   return (
     <View style={styles.container} >
       <View style={{
@@ -196,17 +267,38 @@ const AddProperty = ({ navigation }) => {
               mode="outlined"
       />
     
-      <Button icon="plus" mode='contained' onPress={HandleAddingProperty} style={{
-        width: '50%',
+        <View style={{
+          flexDirection: 'row',
+          width: '90%',
+          alignSelf:'center'
+        }}>
+              {!UpdateItem ?
+        <Button icon="plus" mode='contained' onPress={HandleAddingProperty} style={{
+        width: UpdateItem ? '50%' : '100%',
         marginTop: 20, 
           backgroundColor: 'grey',
         alignSelf:'center'
       }}>
         Save
+          </Button>
+      :
+          
+          <Button icon="plus" mode='contained' onPress={HandlePropertyUpdate} style={{
+        width: UpdateItem ? '100%' : '50%',
+        marginTop: 20, 
+          backgroundColor: 'green',
+        alignSelf:'center'
+      }}>
+        Update
         </Button>
+          }
+  </View>
         </View>
       <View style={{marginTop:20, width:'100%', height:'55%'}}>
-        <FlatList data={properties} renderItem={RenderItem} keyExtractor={(item)=> item?.id + item?.PropertyName} />
+        <FlatList data={properties} renderItem={RenderItem}
+          keyboardShouldPersistTaps={'handled'}
+          
+          keyExtractor={(item) => item?.id + item?.PropertyName} />
       </View>
       
     </View>

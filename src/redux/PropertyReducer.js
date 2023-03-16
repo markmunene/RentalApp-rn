@@ -82,14 +82,14 @@ export default function PropertyReducer(state = initialState, action) {
     
                 let properties = AllProperties.slice();
                 let propertyId = action.payload;
-            let tempropeties =   properties.filter(item=>{
+            let temproperties =   properties.filter(item=>{
                    if (item.id == propertyId ) {
                     return item.Rooms
                    }
             })  
             return {
                 ...state,
-                DropdownProperties: Object.assign([], tempropeties),
+                DropdownProperties: Object.assign([], temproperties),
 
                 }
             }
@@ -99,14 +99,33 @@ export default function PropertyReducer(state = initialState, action) {
         
                     let properties = AllProperties.slice();
                     let propertyId = action.payload;
-                let tempropeties =   properties.filter(item=>{
+                let temproperties =   properties.filter(item=>{
                        if (item.id == propertyId ) {
                         return item
                        }
                 })  
                 return {
                     ...state,
-                    SingleProperty: Object.assign([], tempropeties),
+                    SingleProperty: Object.assign([], temproperties),
+                    }
+            }
+            case actions.Update_Property_Action:
+                {
+                let { AllProperties, PropertiesForFilter } = state;
+        
+                    let properties = PropertiesForFilter.slice();
+                    let property = action.payload;
+                let temproperties =   properties.filter(item=>{
+                       if (item.id !== property.id ) {
+                        return item
+                       }
+                })  
+                temproperties.push(property);
+                return {
+                    ...state,
+                    PropertiesForFilter: Object.assign([], temproperties),
+                    AllProperties: Object.assign([], temproperties),
+
                     }
             }
             case actions.Delete_Property_Action:
@@ -115,11 +134,11 @@ export default function PropertyReducer(state = initialState, action) {
         
                     let properties = PropertiesForFilter.slice();
                     let property = action.payload;
-                let tempropeties =   properties.filter(item=> item.id != property.id)
+                let temproperties =   properties.filter(item=> item.id != property.id)
                    
                 return {
                     ...state,
-                    AllProperties: Object.assign([], tempropeties),
+                    AllProperties: Object.assign([], temproperties),
                     }
             }
         default:
@@ -133,6 +152,10 @@ export const Delete_Property_Action = (data) => ({
 });
 export const Add_New_Property_Action = (data) => ({
     type: actions.Add_New_Property,
+    payload: data
+});
+export const Update_Property_Action = (data) => ({
+    type: actions.Update_Property_Action,
     payload: data
 });
 

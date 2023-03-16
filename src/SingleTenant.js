@@ -5,6 +5,8 @@ import TopBtns from './TopBtns'
 import { useSelector, useDispatch } from 'react-redux';
 import firestore from '@react-native-firebase/firestore'
 import Icon from 'react-native-vector-icons/Ionicons'
+import Icon2 from 'react-native-vector-icons/FontAwesome'
+
 
 import { FAB } from 'react-native-paper'
 
@@ -74,7 +76,9 @@ const SingleTenant = ({ navigation }) => {
           ],
         );
       
-      }
+    }
+    
+  
   return (
       <View style={styles.container}>
           <View style={{
@@ -127,6 +131,20 @@ const SingleTenant = ({ navigation }) => {
                   {SingleTenant[0].leaseStarts}
               </Text>
               </View>
+              <TouchableOpacity
+          style={{
+           
+            justifyContent: 'center',
+            alignItems: 'center',
+
+            
+          }}
+          onPress={()=> navigation.navigate("AddTenant", {item:SingleTenant[0] })}
+        >
+          <Icon2 name="edit" size={40} color="green" style={{
+            alignSelf:'flex-start'
+          }} />
+        </TouchableOpacity>
               <TouchableOpacity
           style={{
            

@@ -21,7 +21,8 @@ const Dropdown = ({ label, data, onSelect, FilterProperty }) => {
             }}>{item.label}</Text>
           </TouchableOpacity>
         )
-    }
+  }
+ 
   const onItemPress = (item) => {
     if (FilterProperty == "Filter") {
         

@@ -1,0 +1,15 @@
+short description :::: Meet M-Rentals app - Your Apartment rent collection helper!
+
+description::
+M-Rentals is an affordable online record keeping system that helps landlords ease rent collection from tenants in different apartments.
+
+
+Introducing "M-Rentals," the perfect app for landlords to manage their rental properties and collect rent from tenants hassle-free! Here's what M-Rentals can do for you:
+
+Rent Collection: With M-Rentals, you can easily collect rent from tenants by setting up automatic payments, sending rent reminders, and accepting payments online through various payment methods.
+
+Property Management: Manage all your rental properties in one place with M-Rentals. You can track rental income, expenses, and even generate financial reports for tax purposes.
+
+Maintenance Requests: Tenants can submit maintenance requests through the app, and you'll be notified instantly. You can track the status of each request, assign tasks to contractors, and even communicate with tenants through the app.
+
+Experience hassle-free rent collection and property management with M-Rentals! Download the app today and take your rental business to the next level.
