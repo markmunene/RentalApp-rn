@@ -7,12 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:249335707071:android:b45211ebbdfc9c2a60dd0a",
+        "mobilesdk_app_id": "1:249335707071:android:b1b7a3e428b20fed60dd0a",
         "android_client_info": {
-          "package_name": "com.rentalapp"
+          "package_name": "com.mvk.rentalsapp"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "249335707071-3usg3bj26ke7kf90ht2gtb5i8qf0281s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mvk.rentalsapp",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
         {
           "client_id": "249335707071-7rmu11nusrjsa5qq8jb5u4p1t2qks36p.apps.googleusercontent.com",
           "client_type": 3

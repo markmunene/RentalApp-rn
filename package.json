@@ -1,6 +1,6 @@
 {
-  "name": "RentalApp",
-  "version": "0.0.1",
+  "name": "mvk.rentalsapp",
+  "version": "0.0.2",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -18,8 +18,8 @@
     "@react-navigation/native": "^6.1.1",
     "@react-navigation/native-stack": "^6.9.7",
     "moment": "^2.29.4",
-    "react": "18.1.0",
-    "react-native": "0.70.6",
+    "react": "18.2.0",
+    "react-native": "0.71.4",
     "react-native-google-signin": "^2.1.1",
     "react-native-modern-datepicker": "^1.0.0-beta.91",
     "react-native-paper": "^5.1.2",

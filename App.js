@@ -55,7 +55,13 @@ const Stack = createNativeStackNavigator();
 
 const App= () => {
   let store = createStore(AllReducers, applyMiddleware(thunk))
-  GoogleSignin.configure();
+  GoogleSignin.configure({
+    webClientId: 'AIzaSyAfub_XIHKI_-Crv9efEMWLFvND3F8y9cI',
+    offlineAccess: true,
+  });
+
+  // AIzaSyAfub_XIHKI_-Crv9efEMWLFvND3F8y9cI
+  
  
   
   let persistor = persistStore(store)
