@@ -3,7 +3,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { Button, TextInput } from 'react-native-paper';
 import Dropdown from './Dropdown';
 import DatePicker from 'react-native-modern-datepicker';
-import SpinnerModal from './SpinnerModal'
+import SpinnerModal from './SpinnerModal';
 import firestore from '@react-native-firebase/firestore'
 import { useToast } from 'react-native-toast-notifications';
 import { useSelector, useDispatch } from 'react-redux';
@@ -13,6 +13,7 @@ import { Filter_SingleProperty_By_Id_Action
  } from './redux/PropertyReducer';
 
 import Header from './Header';
+import moment from 'moment';
 
 const AddTenant = ({ navigation, route }) => {
   const NavData = route.params;
@@ -54,10 +55,8 @@ const AddTenant = ({ navigation, route }) => {
   }
   useEffect(() => {
     let item = NavData?.item;
-   
-    if ( item != undefined) {
 
-      console.log( item.Balance);
+    if ( item != undefined) {
       setEmail(item.Email);
       setTenant(item.Tenant);
       setPhoneNumber(item.PhoneNumber);
@@ -72,7 +71,9 @@ const AddTenant = ({ navigation, route }) => {
       
     }
     
-  },[])
+  },
+    []
+  )
 
   useEffect(
     () => {
@@ -92,8 +93,12 @@ const AddTenant = ({ navigation, route }) => {
       
     },[PropertyName, SingleProperty]
   );
+
   const HandleSaveTenant = async () => {
-    
+   
+    let date =Date.now()
+    let  month = moment(date).format("YYYYMM");
+  
     if (Tenant !== "" && PhoneNumber !== "" && paymentDue !== "" && deposit !== "" && leaseStarts !== "" && occupants !== "" && RentalFees !== "" && RoomNumber
       !== "" && PropertyName !== "" && Email !== "") {
       let data ={
@@ -111,13 +116,25 @@ const AddTenant = ({ navigation, route }) => {
         OverDraft:0,
         RoomNumber: RoomNumber.value,
         createdAt: Date.now(),
-       
       }
+
+      if (leaseStarts < month) {
+        toast.show("Wrong LeaseStarts!!", {
+          type: "danger",
+          placement: "bottom",
+          duration: 2900,
+          offset: 30,
+          animationType: "zoom-in",
+        });
+        return
+        
+      } 
       setShowModal(true)
       await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("tenants").add({
         ...data,
         
       }).then(res => {
+
         dispatch(Add_New_Tenant_Action({
           ...data,
           id: res.id
@@ -140,7 +157,7 @@ const AddTenant = ({ navigation, route }) => {
           offset: 30,
           animationType: "zoom-in",
         });
-        navigation.goBack();
+        // navigation.goBack();
        }).catch(err => {
         console.log("error", err);
       });
@@ -211,7 +228,7 @@ const AddTenant = ({ navigation, route }) => {
           offset: 30,
           animationType: "zoom-in",
         });
-        navigation.goBack();
+        // navigation.navigate("");
 
       }).catch(err => {
         console.log("error", err);
@@ -431,7 +448,7 @@ const AddTenant = ({ navigation, route }) => {
           
         }}
               onChangeText={text => setpaymentDue(text)}
-              label="paymentDue"
+              label="paymentDue Days"
             value={paymentDue}
             keyboardType='numeric'
               mode="outlined"

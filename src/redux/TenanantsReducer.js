@@ -3,7 +3,7 @@ import firestore from '@react-native-firebase/firestore'
 const initialState = {
     Tenants: [],
     TenantsForFilter: [],
-    SingleTeanant: [],
+    SingleTeanants: [],
     Transactions: [],
     Transactions_ForFilter:[],
 }
@@ -13,14 +13,15 @@ export default function TenantReducer (state = initialState, action) {
         case actions.Add_New_Tenant_Action:
             {
                 // something cool
-            const { Tenants } = state;
-            let tempTenants = Tenants.slice();
+            const { TenantsForFilter } = state;
+            let tempTenants = TenantsForFilter.slice();
             const tenant = action.payload;
-            tempTenants.push(tenant)
+            tempTenants.push(tenant);
 
             return {
                 ...state,
-                Tenants:Object.assign([], tempTenants)
+                Tenants: Object.assign([], tempTenants),
+                TenantsForFilter: Object.assign([], tempTenants) 
             }
             }
             
@@ -30,7 +31,7 @@ export default function TenantReducer (state = initialState, action) {
                 const { Transactions } = state;
                 let tempTrans = Transactions.slice();
                 const Trans = action.payload;
-                tempTrans.push(Trans)
+                tempTrans.unshift(Trans)
     
                 return {
                     ...state,
@@ -97,12 +98,14 @@ export default function TenantReducer (state = initialState, action) {
                 let { TenantsForFilter } = state;
         
                     let tempTenants = TenantsForFilter.slice();
-                    let TenantId = action.payload;
+                let TenantId = action.payload;
+              
                 let tempTenant1 =   tempTenants.filter(item=>{
                        if (item.id == TenantId ) {
                         return item
                        }
                 })  
+              
                 return {
                     ...state,
                     SingleTeanants: Object.assign([], tempTenant1),

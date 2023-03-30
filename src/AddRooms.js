@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View , FlatList} from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View , FlatList, Alert} from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Button, TextInput } from 'react-native-paper';
 // import DropDown from "react-native-paper-dropdown";
@@ -9,6 +9,8 @@ import firestore from '@react-native-firebase/firestore';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons'
 import Icon2 from 'react-native-vector-icons/FontAwesome'
+import SpinnerModal from './SpinnerModal';
+
 
 import { useToast } from 'react-native-toast-notifications';
 import { Add_New_Room_Action,Add_Dropdown_Properties_Action , Filter_SingleProperty_By_Id_Action} from './redux/PropertyReducer';
@@ -24,6 +26,9 @@ const AddRooms = ({ navigation }) => {
   const [Tenant, setTenant] = useState(undefined);
   const [PropertyName, setPropertyName] = useState(undefined);
   const [propertyId, setpropertyId] = useState("");
+  const [showModal, setShowModal] = useState(false);
+ 
+
 
   let Landlord = useSelector(state => state.Landlord.Authenticated_landlord);
   let DropdownProperties = useSelector(state => state.Propertys.DropdownProperties);
@@ -119,18 +124,33 @@ const AddRooms = ({ navigation }) => {
  try {
   if (PropertyName !== undefined && RoomNumber !== "") {
      
-    let Rooms1 =  SingleProperty[0].Rooms ;
-    Rooms1.push({
-      PropertyName: PropertyName.label,
-      RoomNumber
-    })
+    let Rooms1 = SingleProperty[0].Rooms;
+    let roomExist = Rooms1.filter(item => item.RoomNumber == RoomNumber);
+    if (roomExist.length <=0) {
+      Rooms1.push({
+        PropertyName: PropertyName.label,
+        RoomNumber
+      })
+      
+    } else {
+
+      toast.show("Room Already Exists!", {
+        type: "danger",
+        placement: "bottom",
+        duration: 2900,
+        offset: 30,
+        animationType: "zoom-in",
+      });
+      return
+      
+    }
     // console.log(Rooms1);
     
-
+setShowModal(true)
     await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("property").doc(PropertyName.value).update({
       Rooms:Rooms1
     }).then(res => {
-      
+      setShowModal(false)
       // dispatch(Filter_SingleProperty_By_Id_Action(PropertyName.value))
       dispatch(Add_New_Room_Action({
         ...SingleProperty[0],
@@ -168,67 +188,103 @@ const AddRooms = ({ navigation }) => {
     
   }
   const HandleDeleteRooms = async (Room) => {
-    try {
+    Alert.alert(
+      'Delete action confirmation',
+      'Are  u sure you want to delete this Room',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log("nah"),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            try {
   
         
          
-        let Rooms1 = SingleProperty[0].Rooms.filter(item => item.RoomNumber != Room.RoomNumber);
-
-        let propertyId = properties.filter(item => {
-          if (item.PropertyName === Room.PropertyName) {
-            return item.id
-          }
-        })
-        
-        await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("property").doc(propertyId[0].id).update({
-          Rooms:Rooms1
-        }).then(res => {
-          
-          // dispatch(Filter_SingleProperty_By_Id_Action(PropertyName.value))
-          dispatch(Add_New_Room_Action({
-            ...SingleProperty[0],
-            Rooms:Rooms1
-    
-          }));
-          // setPropertyName(undefined)
-          setRoomNumber("");
-    
-          toast.show("Room Deleted Successfully", {
-            type: "success",
-            placement: "bottom",
-            duration: 2400,
-            offset: 30,
-            animationType: "zoom-in",
-          });
-        }).catch(err => {
-          console.log(err);
-        })
-        
+              let Rooms1 = SingleProperty[0].Rooms.filter(item => item.RoomNumber != Room.RoomNumber);
       
-     
-     } catch (error) {
-      console.log(error);
-     }
+              let propertyId = properties.filter(item => {
+                if (item.PropertyName === Room.PropertyName) {
+                  return item.id
+                }
+              })
+            setShowModal(true);
+              
+              await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("property").doc(propertyId[0].id).update({
+                Rooms:Rooms1
+              }).then(res => {
+                setShowModal(false)
+                
+                // dispatch(Filter_SingleProperty_By_Id_Action(PropertyName.value))
+                dispatch(Add_New_Room_Action({
+                  ...SingleProperty[0],
+                  Rooms:Rooms1
+          
+                }));
+                // setPropertyName(undefined)
+                setRoomNumber("");
+          
+                toast.show("Room Deleted Successfully", {
+                  type: "success",
+                  placement: "bottom",
+                  duration: 2400,
+                  offset: 30,
+                  animationType: "zoom-in",
+                });
+              }).catch(err => {
+                console.log(err);
+              })
+              
+            
+           
+           } catch (error) {
+            console.log(error);
+           }
+          },
+        },
+      ],
+    );
+   
   }
   const HandleUpdateRooms = async () => {
     try {
       if ( RoomNumber !== "") {
          
-        let Rooms1 = SingleProperty[0].Rooms.filter(item => item.RoomNumber != RoomToUpdate.RoomNumber);
-        Rooms1.push({
-          PropertyName: RoomToUpdate.PropertyName ,
-          RoomNumber
-        })
+        let Rooms1 = SingleProperty[0].Rooms;
+    
         let propertyId = properties.filter(item => {
           if (item.PropertyName === RoomToUpdate.PropertyName) {
             return item.id
           }
         })
-       
+        let roomExist = Rooms1.filter(item => item.RoomNumber == RoomNumber);
+        
+        if (roomExist.length <=0) {
+          Rooms1.push({
+            PropertyName: PropertyName.label,
+            RoomNumber
+          })
+          
+        } else {
+    
+          toast.show("Room Already Exists!", {
+            type: "danger",
+            placement: "bottom",
+            duration: 2900,
+            offset: 30,
+            animationType: "zoom-in",
+          });
+          return
+          
+        }
+       setShowModal(true)
         await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("property").doc(propertyId[0].id).update({
           Rooms:Rooms1
         }).then(res => {
-          
+          setShowModal(false)
           dispatch(Add_New_Room_Action({
             ...SingleProperty[0],
             Rooms:Rooms1
@@ -239,7 +295,7 @@ const AddRooms = ({ navigation }) => {
           setRoomToUpdate("");
           setUpdateRoomstate(false);
     
-          toast.show("Room Deleted Successfully", {
+          toast.show("Room Updated Successfully", {
             type: "success",
             placement: "bottom",
             duration: 2400,
@@ -283,6 +339,8 @@ const AddRooms = ({ navigation }) => {
         <Header Title="Add Rooms" toHome="home" iconName="arrow-left-bold" navigation={navigation}  />
 
       </View>
+      <SpinnerModal showModal={showModal} title="please wait ..." />
+
       <View style={{width:'100%'}}>
 
       
@@ -308,14 +366,14 @@ const AddRooms = ({ navigation }) => {
       />
         <View style={{
           flexDirection: 'row',
-          alignSelf:'center'
+          alignSelf: 'center',
+          width:'90%'
         }}>
-          {
-            !UpdateRoomstate ?
+          
            
               <Button icon="plus" mode='contained'
                 style={{
-                  width: UpdateRoomstate ? '100%' : '50%',
+                  width: '45%',
                   marginTop: 20,
                   backgroundColor: 'grey',
                   alignSelf: 'center'
@@ -326,11 +384,12 @@ const AddRooms = ({ navigation }) => {
               >
                 Save
               </Button>
-              :
+              
               <Button icon="plus" mode='contained'
                 style={{
-                  width:  UpdateRoomstate ? '50%' : '100%',
+                  width:   '50%' ,
                   marginTop: 20,
+                  marginLeft:10,
                   backgroundColor: 'green',
                   alignSelf: 'center'
                 }}
@@ -340,7 +399,7 @@ const AddRooms = ({ navigation }) => {
               >
                 Update
               </Button>
-      }
+      
           
      </View>
         </View>

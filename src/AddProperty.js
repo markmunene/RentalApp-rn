@@ -11,6 +11,7 @@ import Icon2 from 'react-native-vector-icons/FontAwesome'
 import { Add_New_Property_Action, Delete_Property_Action, Update_Property_Action } from './redux/PropertyReducer';
 import firestore from '@react-native-firebase/firestore'
 import { useToast } from 'react-native-toast-notifications';
+import SpinnerModal from './SpinnerModal';
 
 const AddProperty = ({ navigation, route }) => {
 
@@ -20,6 +21,8 @@ const AddProperty = ({ navigation, route }) => {
   const [UpdateItem, setUpdateItem] = useState(false);
   const [PropertyName, setPropertyName] = useState("");
   const [UpdateItems, setUpdateItems] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+
 
   const [Location, setLocation] = useState("");
   let Landlord = useSelector(state => state.Landlord.Authenticated_landlord);
@@ -28,12 +31,13 @@ const AddProperty = ({ navigation, route }) => {
   
   const HandleAddingProperty = async () => {
     if (PropertyName !== "" && Location !== "") {
+      setShowModal(true)
       await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("property").add({
         PropertyName,
         Location, 
         Rooms:[]
       }).then(res => {
-
+setShowModal(false)
         dispatch(Add_New_Property_Action({
           Location, 
           PropertyName, 
@@ -74,12 +78,13 @@ const AddProperty = ({ navigation, route }) => {
 
   const HandlePropertyUpdate = async () => {
     if (PropertyName !== "" && Location !== "") {
+      setShowModal(true)
       await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("property").doc(UpdateItems.id).update({
         PropertyName,
         Location, 
         Rooms:UpdateItems.Rooms
       }).then(res => {
-
+setShowModal(false)
         dispatch(Update_Property_Action({
           Location, 
           PropertyName, 
@@ -125,9 +130,13 @@ const AddProperty = ({ navigation, route }) => {
           text: 'OK',
           onPress: async () => {
             try {
+setShowModal(true)
+
               await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("property").doc(item.id)
                 .delete().then(res => {
-                  console.log(res);
+
+setShowModal(false)
+                  
                   dispatch(Delete_Property_Action(item))
                   toast.show("Property Deleted Successfully", {
                     type: "danger",
@@ -239,6 +248,8 @@ const AddProperty = ({ navigation, route }) => {
       }}>
         <Header Title="Add Property" toHome="home" iconName="arrow-left-bold" navigation={navigation}  />
       </View>
+      <SpinnerModal showModal={showModal} title="please wait ..." />
+
       <View style={{
         width:'100%'
       }}>
@@ -270,28 +281,30 @@ const AddProperty = ({ navigation, route }) => {
         <View style={{
           flexDirection: 'row',
           width: '90%',
-          alignSelf:'center'
+          alignSelf: 'center',
+          width:'90%'
         }}>
-              {!UpdateItem ?
+          
         <Button icon="plus" mode='contained' onPress={HandleAddingProperty} style={{
-        width: UpdateItem ? '50%' : '100%',
+        width: '50%' ,
         marginTop: 20, 
           backgroundColor: 'grey',
         alignSelf:'center'
       }}>
         Save
           </Button>
-      :
+   
           
           <Button icon="plus" mode='contained' onPress={HandlePropertyUpdate} style={{
-        width: UpdateItem ? '100%' : '50%',
-        marginTop: 20, 
+        width: '50%',
+            marginTop: 20, 
+        marginLeft:10,
           backgroundColor: 'green',
         alignSelf:'center'
       }}>
         Update
         </Button>
-          }
+          
   </View>
         </View>
       <View style={{marginTop:20, width:'100%', height:'55%'}}>

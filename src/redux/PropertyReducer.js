@@ -17,7 +17,8 @@ export default function PropertyReducer(state = initialState, action) {
             return {
                  ...state,
                 AllProperties: Object.assign([], property),
-                PropertiesForFilter: Object.assign([], property)
+                PropertiesForFilter: Object.assign([], property),
+                SingleProperty: Object.assign([], property[0])
             }
         }
         case actions.Add_New_Property:

@@ -1,52 +1,69 @@
-import { StyleSheet, Text, View , ActivityIndicator} from 'react-native'
-import React from 'react'
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import React from 'react';
+import {
+  StyleProp,
+  ViewStyle,
+  Animated,
+  StyleSheet,
+  Platform,
+  ScrollView,
+  Text,
+  SafeAreaView,
+  I18nManager,
+} from 'react-native';
+import { AnimatedFAB } from 'react-native-paper';
 
-const AddTenant = React.lazy(() => import('./AddTenant'));
-const AddRooms = React.lazy(() => import('./AddRooms'));
-const AddProperty = React.lazy(() => import('./AddProperty'));
-const Home = React.lazy(() => import('./Home'));
-import { StackActions } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+const MyComponent = ({
+  animatedValue,
+  visible,
+  extended,
+  label,
+  animateFrom,
+  style,
+  iconMode,
+}) => {
+  const [isExtended, setIsExtended] = React.useState(true);
 
-const Tab = createBottomTabNavigator();
-const BottomNavigationScreen = () => {
- 
- 
-    // const [routes] = React.useState([
-    //     { key: 'Home', title: 'Home', focusedIcon: 'home', unfocusedIcon: 'heart-outline'},
-    //     { key: 'AddTenant', title: 'Add Tenant', focusedIcon: 'human-queue' },
-    //     { key: 'AddRooms', title: 'AddRooms', focusedIcon: 'hoop-house' },
-    //       { key: 'AddProperty', title: 'AddProperty', focusedIcon: 'warehouse' },
-         
-    //   ]);
+  const isIOS = Platform.OS === 'ios';
 
-  
-    
+  const onScroll = ({ nativeEvent }) => {
+    const currentScrollPosition =
+      Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
+
+    setIsExtended(currentScrollPosition <= 0);
+  };
+
+  const fabStyle = { [animateFrom]: 16 };
 
   return (
-    <Tab.Navigator screenOptions={{
-      headerShown:false
-    }}>
-      <Tab.Screen name="Home" component={Home}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Icon name ="home" size={25} color="black" />
-          )
-            
-          
-        }}
+    <SafeAreaView style={styles.container}>
+      <ScrollView onScroll={onScroll}>
+        {[...new Array(100).keys()].map((_, i) => (
+          <Text>{i}</Text>
+        ))}
+      </ScrollView>
+      <AnimatedFAB
+        icon={'plus'}
+        label={'Label'}
+        extended={isExtended}
+        onPress={() => console.log('Pressed')}
+        visible={visible}
+        animateFrom={'right'}
+        iconMode={'static'}
+        style={[styles.fabStyle, style, fabStyle]}
       />
-      <Tab.Screen name="Tenants" component={AddTenant} />
-      <Tab.Screen name="Rooms" component={AddRooms} />
-      <Tab.Screen name="Property" component={AddProperty} />
+    </SafeAreaView>
+  );
+};
 
+export default MyComponent;
 
-    </Tab.Navigator>
-  )
-}
-
-export default BottomNavigationScreen
-
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+  },
+  fabStyle: {
+    bottom: 16,
+    right: 16,
+    position: 'absolute',
+  },
+});

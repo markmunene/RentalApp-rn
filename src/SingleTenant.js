@@ -8,14 +8,19 @@ import Icon from 'react-native-vector-icons/Ionicons'
 import Icon2 from 'react-native-vector-icons/FontAwesome'
 
 
-import { FAB } from 'react-native-paper'
+import { AnimatedFAB } from 'react-native-paper'
 
 import { Filter_Transactions_By_Name_Action,Get_All_Transactions_Action, Delete_Tenant_Action } from './redux/TenanantsReducer';
 import { useToast } from 'react-native-toast-notifications';
 const SingleTenant = ({ navigation }) => {
+    
     const toast = useToast();
     const SingleTenant = useSelector(state => state.Tenants.SingleTeanants);
     let Landlord = useSelector(state => state.Landlord.Authenticated_landlord);
+    const [isExtended, setIsExtended] = React.useState(true);
+    const [visible, setvisible] = React.useState(true);
+
+
    
     const dispatch = useDispatch();
     useEffect(() => {
@@ -250,8 +255,12 @@ const SingleTenant = ({ navigation }) => {
                 {SingleTenant[0].deposit}
               </Text>
           </View>
-          <FAB
+          <AnimatedFAB
               icon="plus"
+              label={'Add payment'}
+              visible={true}
+              animateFrom={'right'}
+              extended={true}
               style={styles.fabStyle}
               onPress={()=>navigation.navigate("addrent")}
           />

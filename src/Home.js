@@ -74,7 +74,8 @@ const Home = ({ navigation }) => {
     }, [AllTenants])
     
 
-    const RenderItem = ({item}) => {
+    const RenderItem = ({ item }) => {
+       
         return (
             <TouchableOpacity style={{
                 width: '92%', height: 80,
@@ -219,11 +220,24 @@ const Home = ({ navigation }) => {
               
           }}>
                  <Searchbar
-                     placeholder="Tenant Name"
-                     onChangeText={onChangeSearch}
+                     placeholder="Search Tenant..."
+                  onChangeText={onChangeSearch}
+                  inputStyle={{
+                  paddingTop:0,
+                      marginTop: 0,
+                      fontSize: 14, alignItems: 'center', justifyContent: 'center', marginBottom: 10,
+                      height: 40,
+                      fontWeight:'900'
+                 }}
+                  
                   value={searchQuery}
                   style={{
-                width:'70%'
+                      width: '70%', 
+                      textAlign: 'center',
+                      fontSize:10,
+                     marginTop:0,
+                      height:40
+                      
             }}
               />
               <TouchableOpacity style={{

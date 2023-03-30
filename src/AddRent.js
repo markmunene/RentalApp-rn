@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native'
 import React, { useState, useCallback, useEffect } from 'react'
 import { Button, TextInput } from 'react-native-paper';
 import DropDown from "react-native-paper-dropdown";
@@ -102,7 +102,7 @@ const AddRent = ({ navigation }) => {
             offset: 30,
             animationType: "zoom-in",
           });
-          navigation.goBack();
+          navigation.navigate("PaymentsHistory");
           setShowModal(false);
           dispatch(Add_New_Transaction_Action({ ...Data }));
       })
@@ -132,20 +132,24 @@ const AddRent = ({ navigation }) => {
         <Header Title="Add Rent" iconName="arrow-left-bold" navigation={navigation}  />
 
       </View>
+      <View style={{
+        width: '100%',
+        
+      }}>
+
+     
+      <ScrollView keyboardShouldPersistTaps={'handled'}>
+        <View style={{
+          width: '100%',
+          height:'50%'
+      }}>
+
+    
       <View style={{height:'10%'}}>
      <SpinnerModal title="Please wait..." showModal={showModal} />
 
       </View>
-           {/* <DropDown
-              label={"Gender"}
-              mode={"outlined"}
-              visible={showDropDown}
-              showDropDown={() => setShowDropDown(true)}
-              onDismiss={() => setShowDropDown(false)}
-              value={Tenant}
-              setValue={setTenant}
-              list={colorList}
-            /> */}
+       
         <TextInput
         style={{
           width: '90%',
@@ -184,63 +188,24 @@ const AddRent = ({ navigation }) => {
               value={PaymentMethod}
               mode="outlined"
       />
-       {/* <View style={{ width: '50%', alignSelf: 'center',  justifyContent:'center', alignItems:'center', elevation:200, zIndex:900}}>
-        {show && (
-        <DatePicker
-                mode="monthYear"
-                selectorStartingYear={2022}
-                onMonthYearChange={selectedDate => handleMONTH(selectedDate)}
-                style={{
-                  width: 300, height: 200,
-                  justifySelf: 'center',
-                  alignSelf: 'center',
-                  zIndex: 400,
-
-                }}
-                options={{
-                  backgroundColor: '#fff',
-                  zIndex: 400,
-                  elevation: 400,
-                }}
-
-      />
-            )}
-            </View>
-       <TouchableOpacity
-        style={{
-          width: '90%',
-          height:40,
-          alignSelf: 'center',
-          marginTop: 20,
-          borderColor: 'black'
-          , borderRadius: 3,
-          borderWidth: 1,
-          justifyContent: 'center',
-          paddingHorizontal:20
-          
-          
-        }}
-        onPress={()=>setShow(!show)}
-              
-      >
-        <Text style={{
-          fontSize:18
-        }}>
-          Month {Month}
-        </Text>
-        </TouchableOpacity> */}
+    
 
       
       <Button icon="plus" mode='contained' style={{
         width: '50%',
         marginTop: 20, 
-        backgroundColor:'grey'
+              backgroundColor: 'grey',
+        alignSelf:'center'
       }}
         onPress={HandleAddRent}
       >
         Save
       </Button>
+      </View>
       
+
+        </ScrollView>
+        </View>
     </View>
   )
 }

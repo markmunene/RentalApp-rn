@@ -21,17 +21,6 @@ import {
 
 import { ToastProvider } from 'react-native-toast-notifications'
 import { Provider as PaperProvider } from 'react-native-paper';
-import AddRent from './src/AddRent';
-import AddTenant from './src/AddTenant';
-import AddRooms from './src/AddRooms';
-import AddProperty from './src/AddProperty';
-import SingleTenant from './src/SingleTenant';
-import PaymentsHistory from './src/PaymentsHistory';
-import SingleTenantBalances from './src/SingleTenantBalances';
-import Home from './src/Home';
-import Login from './src/Login';
-import Register from './src/Register';
-import BottomNavigationScreen from './src/BottomNavigation';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -49,7 +38,7 @@ import {persistStore} from 'redux-persist';
 import {PersistGate} from 'redux-persist/integration/react';
 import { createStore } from 'redux';
 import AllReducers from './src/redux/AllReducers';
-import Routes from './Routes';
+
 import AuthScreenController from './AuthScreenController';
 const Stack = createNativeStackNavigator();
 
