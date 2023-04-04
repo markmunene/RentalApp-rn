@@ -65,7 +65,25 @@ const PaymentsHistory = ({ navigation }) => {
          .catch((err) => {
            err && console.log(err);
          });
-     }
+    }
+    const HandleMessageSending = async() => {
+        let options = {
+            title: "Share via Message",
+            message: `Dear ${SingleTenant[0].Tenant} You have a Balance of
+         ${SingleTenant[0].Balance} Please Clear Your Balance. with Regards ${Landlord[0].OwnerName} LandLord Thank You`,
+       
+            social: Share.Social.SMS,
+            recipient: `254${SingleTenant[0].PhoneNumber}`,
+           
+        }
+        await Share.shareSingle(options)
+         .then((res) => {
+           console.log(res);
+         })
+         .catch((err) => {
+           err && console.log(err);
+         });
+    }
     const RenderItem = ({ item }) => {
         return (
             <View style={styles.BioWrapper}>
@@ -139,7 +157,7 @@ const PaymentsHistory = ({ navigation }) => {
                   color: 'black',
                   fontSize:18
               }}>
-                  {moment().format("MMMYY")}
+                  {moment().format("MMMMYYYY")}
               </Text>
               <Text style={{
                   color: 'grey',
@@ -161,7 +179,7 @@ const PaymentsHistory = ({ navigation }) => {
               animateFrom={'right'}
               extended={isExtended}
        style={styles.fabStyle3}
-       onPress={()=>HandleremiderSending()}
+       onPress={()=>HandleMessageSending()}
    />
         
         <AnimatedFAB

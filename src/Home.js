@@ -53,8 +53,9 @@ const Home = ({ navigation }) => {
         }, 0);
        
         let tempActualBalance = AllTenants.reduce((a, b) => {
-            return Number(b.RentalFees) + a;  
+            return Number(b.ActualBalance) + a;  
         }, 0)
+        console.log("to be paid",tempActualBalance, "actually paid", tempPaidBalance);
        
         setActulaBalanceState(tempActualBalance);
         setPaidBalanceState(tempPaidBalance);
@@ -146,7 +147,8 @@ const Home = ({ navigation }) => {
                                 let Bal = docs.data().OverDraft - docs.data().RentalFees;
                                 await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("tenants").doc(docs.id).update({
                                     Balance: Bal <= 0 ? Math.abs(Bal) : 0,
-                                    OverDraft: Bal <= 0 ? 0: Math.abs(Bal)
+                                    OverDraft: Bal <= 0 ? 0 : Math.abs(Bal),
+                                    ActualBalance: Bal <= 0 ? Math.abs(Bal) : 0
                                 }).then(res => { }).catch(err => {
                                     console.log(err, "kwanza");
                                 })
@@ -155,11 +157,12 @@ const Home = ({ navigation }) => {
                                     ...docs.data(),
                                     id: docs.id,
                                     Balance: Bal <= 0 ? Math.abs(Bal) : 0,
-                                    OverDraft: Bal <= 0 ? 0: Math.abs(Bal)
+                                    OverDraft: Bal <= 0 ? 0 : Math.abs(Bal),
+                                    ActualBalance:Bal <= 0 ? Math.abs(Bal) : 0
                                     }))
                                     
                             } else {
-                               console.log(Number(docs.data().Balance), docs.data().Tenant);
+                             
                                     await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("tenants").doc(docs.id).update({
                                         Balance: Number(docs.data().RentalFees) + Number(docs.data().Balance),
                                         OverDraft:0
@@ -261,8 +264,7 @@ const Home = ({ navigation }) => {
                   
               </TouchableOpacity>
           </View>
-          {
-              showFilters ? 
+          {showFilters ? 
               <View style={{
                 flexDirection: 'row',
                 width: '100%',
@@ -353,13 +355,13 @@ const Home = ({ navigation }) => {
                   }>
                       <Text style={{fontWeight: '900',
                       fontSize:12}}>
-                          {moment().format("MMMYY")}
+                          {moment().format("MMMYYYY")}
                       </Text>
                   </View>
 
               </View>
               <View style={{marginBottom:20}}>
-                  <Text style={{ fontSize: 18 }}>Total rent for { moment(Date.now()).format("MMMYY") }</Text>
+                  <Text style={{ fontSize: 18 }}>Total rent for { moment(Date.now()).format("MMMYYYY") }</Text>
                   <Text style={{
                       fontWeight: '900',
                       fontSize:16
@@ -383,7 +385,7 @@ const Home = ({ navigation }) => {
                       }}>Collected</Text>
                       <Text style={{fontWeight: '900',
                       fontSize:16}}>
-                          Ksh {  ActulaBalanceState > PaidBalanceState ? ActulaBalanceState - PaidBalanceState: 0}
+                          Ksh {  ActulaBalanceState-PaidBalanceState}
                       </Text>
                   </View>
                   <View>
@@ -392,7 +394,7 @@ const Home = ({ navigation }) => {
                       }}>Pending</Text>
                       <Text style={{fontWeight: '900',
                       fontSize:16}}>
-                          Ksh {ActulaBalanceState-(ActulaBalanceState - PaidBalanceState)}
+                          Ksh {PaidBalanceState}
                       </Text>
                   </View>
                   

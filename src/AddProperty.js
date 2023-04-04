@@ -84,7 +84,7 @@ setShowModal(false)
         Location, 
         Rooms:UpdateItems.Rooms
       }).then(res => {
-setShowModal(false)
+        setShowModal(false)
         dispatch(Update_Property_Action({
           Location, 
           PropertyName, 
