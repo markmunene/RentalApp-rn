@@ -48,11 +48,15 @@ const Home = ({ navigation }) => {
     // }, []);
     useEffect(() => {
         // console.log(AllTenants);
+        AllTenants.map(item => {
+            console.log("NAme::", item.Tenant, "Actual::", item.ActualBalance, "Bal::", item.Balance);
+        })
         let tempPaidBalance = AllTenants.reduce((a, b) => {
             return Number(b.Balance) + Number(a)
         }, 0);
        
         let tempActualBalance = AllTenants.reduce((a, b) => {
+        
             return Number(b.ActualBalance) + a;  
         }, 0)
         console.log("to be paid",tempActualBalance, "actually paid", tempPaidBalance);
@@ -60,12 +64,9 @@ const Home = ({ navigation }) => {
         setActulaBalanceState(tempActualBalance);
         setPaidBalanceState(tempPaidBalance);
         if (tempActualBalance>0) {
-        
             setProgressState((tempActualBalance - tempPaidBalance) / tempActualBalance);
         } else {
-          
-            setProgressState(0);
-            
+            setProgressState(0);   
         }
       
     
@@ -137,7 +138,7 @@ const Home = ({ navigation }) => {
             
            
             if (JSON.parse(storedMonth) !== month) {
-              
+              console.log("wewe ni nani bwana");
                 await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("tenants").get().then(res => {
                 
                     res.docs.map( async docs => {
@@ -165,7 +166,8 @@ const Home = ({ navigation }) => {
                              
                                     await firestore().collection("Properties").doc(Landlord[0].OwnerId).collection("tenants").doc(docs.id).update({
                                         Balance: Number(docs.data().RentalFees) + Number(docs.data().Balance),
-                                        OverDraft:0
+                                        OverDraft: 0,
+                                        ActualBalance:Number(docs.data().RentalFees) + Number(docs.data().Balance),
                                     }).then(res => { }).catch(err => {
                                         console.log(err, "azimio");
                                     })
@@ -173,7 +175,8 @@ const Home = ({ navigation }) => {
                                     ...docs.data(),
                                     id: docs.id,
                                     Balance: Number(docs.data().RentalFees) + Number(docs.data().Balance),
-                                    OverDraft:0
+                                    OverDraft: 0,
+                                    ActualBalance:Number(docs.data().RentalFees) + Number(docs.data().Balance),
                                     }))
                                 }
                             
