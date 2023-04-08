@@ -48,9 +48,7 @@ const Home = ({ navigation }) => {
     // }, []);
     useEffect(() => {
         // console.log(AllTenants);
-        AllTenants.map(item => {
-            console.log("NAme::", item.Tenant, "Actual::", item.ActualBalance, "Bal::", item.Balance);
-        })
+      
         let tempPaidBalance = AllTenants.reduce((a, b) => {
             return Number(b.Balance) + Number(a)
         }, 0);
@@ -59,8 +57,7 @@ const Home = ({ navigation }) => {
         
             return Number(b.ActualBalance) + a;  
         }, 0)
-        console.log("to be paid",tempActualBalance, "actually paid", tempPaidBalance);
-       
+        
         setActulaBalanceState(tempActualBalance);
         setPaidBalanceState(tempPaidBalance);
         if (tempActualBalance>0) {
