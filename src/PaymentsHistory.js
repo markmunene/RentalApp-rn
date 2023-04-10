@@ -73,7 +73,7 @@ const PaymentsHistory = ({ navigation }) => {
          ${SingleTenant[0].Balance} Please Clear Your Balance. with Regards ${Landlord[0].OwnerName} LandLord Thank You`,
        
             social: Share.Social.SMS,
-            recipient: `254${SingleTenant[0].PhoneNumber}`,
+            recipient: `0${SingleTenant[0].PhoneNumber}`,
            
         }
         await Share.shareSingle(options)

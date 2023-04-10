@@ -6,6 +6,8 @@ export const Add_Drop_Down_Properties_Action = "Add_Drop_Down_Properties_Action"
 export const PropertyRooms_Action = "PropertyRooms_Action";
 export const Get_All_Properties_Action = "Get_All_Properties_Action";
 export const Filter_SingleProperty_By_Id_Action = "Filter_SingleProperty_By_Id_Action";
+export const Filter_SingleProperty_By_Name = "Filter_SingleProperty_By_Name";
+
 // tenant actions
 
 export const Add_New_Tenant_Action = "Add_New_Tenant_Action";

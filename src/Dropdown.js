@@ -62,7 +62,7 @@ const [dropdownWidth, setDropdownWidth] = useState(0);
     const renderDropdown = () => {
      
           return (
-            <Modal visible={visible} transparent  animationType="none" >
+            <Modal visible={visible}  transparent  animationType="none" >
             <TouchableOpacity
               style={{...styles.overlay, width:dropdownWidth, alignSelf:'center'}}
                       onPress={() => setVisible(false)}

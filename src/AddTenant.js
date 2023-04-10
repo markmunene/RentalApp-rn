@@ -23,6 +23,8 @@ const AddTenant = ({ navigation, route }) => {
   let DropdownProperties = useSelector(state => state.Propertys.DropdownProperties);
   let SingleProperty = useSelector(state => state.Propertys.SingleProperty);
 
+ 
+
     const [RentAmount, setRentAmount] = useState();
     const [showDropDown, setShowDropDown] = useState(false);
   const [Tenant, setTenant] = useState("");
@@ -77,6 +79,7 @@ const AddTenant = ({ navigation, route }) => {
 
   useEffect(
     () => {
+    
      
       if (PropertyName !== undefined) {
        

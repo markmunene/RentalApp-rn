@@ -29,6 +29,8 @@ const Login = ({ navigation }) => {
 
     useEffect(() => {
         dispatch(Add_Auth_Screen_Action("Login"))
+
+     
     },[])
     
     const HandleSignUpWithEmail = async() => {

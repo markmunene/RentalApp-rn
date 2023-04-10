@@ -35,7 +35,7 @@ const Header = ({ navigation, Title, where, iconName, showIcons, toHome }) => {
     })
   }
   const HandleSyncData = () => {
-    dispatch(Get_All_Properties_Action({ OwnerId: Landlord[0].OwnerId }))
+    dispatch(Get_All_Properties_Action({ OwnerId: Landlord[0].OwnerId }));
     dispatch(Get_All_tenants_Action({ OwnerId: Landlord[0].OwnerId }));
 
     

@@ -20,3 +20,7 @@ Maintenance Requests: Tenants can submit maintenance requests through the app, a
 Document Management: Keep all your rental agreements, lease agreements, and other essential documents organized in one place with RentCollect. You can upload, store, and share documents with tenants securely.
 
 Experience hassle-free rent collection and property management with RentCollect! Download the app today and take your rental business to the next level.
+
+
+changing sdk versions
+https://www.youtube.com/watch?v=qo3SbdbXFos

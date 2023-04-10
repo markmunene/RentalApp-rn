@@ -9,6 +9,7 @@ import Icon2 from 'react-native-vector-icons/FontAwesome'
 
 
 import { AnimatedFAB } from 'react-native-paper'
+import { Filter_SingleProperty_By_Name } from './redux/PropertyReducer';
 
 import { Filter_Transactions_By_Name_Action,Get_All_Transactions_Action, Delete_Tenant_Action } from './redux/TenanantsReducer';
 import { useToast } from 'react-native-toast-notifications';
@@ -24,13 +25,19 @@ const SingleTenant = ({ navigation }) => {
    
     const dispatch = useDispatch();
     useEffect(() => {
-    dispatch(Filter_Transactions_By_Name_Action(SingleTenant[0].id))
+        dispatch(Filter_Transactions_By_Name_Action(SingleTenant[0].id))
+        
     }, [])
+    // console.log(SingleTenant[0]);
     useEffect(() => {
         dispatch(Get_All_Transactions_Action({
             OwnerId: Landlord[0].OwnerId,
             id: SingleTenant[0].id
         }))
+        dispatch(Filter_SingleProperty_By_Name(
+             SingleTenant[0].PropertyName
+        ))
+        
     
         return () => {
         }
@@ -144,7 +151,7 @@ const SingleTenant = ({ navigation }) => {
 
             
           }}
-          onPress={()=> navigation.navigate("AddTenant", {item:SingleTenant[0] })}
+          onPress={()=> navigation.navigate("AddTenant", {item:SingleTenant[0]})}
         >
           <Icon2 name="edit" size={40} color="green" style={{
             alignSelf:'flex-start'

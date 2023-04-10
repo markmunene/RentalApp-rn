@@ -110,6 +110,22 @@ export default function PropertyReducer(state = initialState, action) {
                     SingleProperty: Object.assign([], temproperties),
                     }
             }
+            case actions.Filter_SingleProperty_By_Name:
+                {
+                let { AllProperties } = state;
+        
+                    let properties = AllProperties.slice();
+                    let propertyName = action.payload;
+                let temproperties =   properties.filter(item=>{
+                       if (item.PropertyName == propertyName ) {
+                        return item
+                       }
+                })  
+                return {
+                    ...state,
+                    SingleProperty: Object.assign([], temproperties),
+                    }
+            }
             case actions.Update_Property_Action:
                 {
                 let { AllProperties, PropertiesForFilter } = state;
@@ -170,6 +186,10 @@ export const PropertyRooms_Action = (data) => ({
 });
 export const Filter_SingleProperty_By_Id_Action = (data) => ({
     type: actions.Filter_SingleProperty_By_Id_Action,
+    payload: data
+});
+export const Filter_SingleProperty_By_Name = (data) => ({
+    type: actions.Filter_SingleProperty_By_Name,
     payload: data
 });
 export const Add_Dropdown_Properties_Action = () => ({

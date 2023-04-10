@@ -20,7 +20,7 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 
 import { ToastProvider } from 'react-native-toast-notifications'
-import { Provider as PaperProvider } from 'react-native-paper';
+import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -44,23 +44,25 @@ const Stack = createNativeStackNavigator();
 
 const App= () => {
   let store = createStore(AllReducers, applyMiddleware(thunk))
-  GoogleSignin.configure({
-    webClientId: 'AIzaSyAfub_XIHKI_-Crv9efEMWLFvND3F8y9cI',
-    offlineAccess: true,
-  });
+  GoogleSignin.configure();
 
   // AIzaSyAfub_XIHKI_-Crv9efEMWLFvND3F8y9cI
   
  
   
   let persistor = persistStore(store)
+  let theme = {
+    ...DefaultTheme,
+    mode: 'exact',
+    dark:false
+  }
 
 
   return (  
     <NavigationContainer>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor} >
-    <PaperProvider>
+    <PaperProvider theme={theme}>
       <ToastProvider>
         <AuthScreenController />
       </ToastProvider>  
